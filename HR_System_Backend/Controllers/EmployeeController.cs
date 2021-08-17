@@ -100,7 +100,7 @@ namespace HR_System_Backend.Controllers
             }
         }
 
-
+   
         [HttpPost]
         [Route("Add")]
         public async Task<IActionResult> Add([FromBody] EmployeeInput input)

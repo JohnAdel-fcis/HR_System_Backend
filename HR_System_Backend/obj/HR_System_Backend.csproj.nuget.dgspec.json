@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj": {}
+    "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj": {}
   },
   "projects": {
-    "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj": {
+    "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
+        "projectUniqueName": "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj",
         "projectName": "HR_System_Backend",
-        "projectPath": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
+        "projectPath": "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj",
         "packagesPath": "C:\\Users\\John.Adel\\.nuget\\packages\\",
-        "outputPath": "C:\\HR_System_Backend-master\\HR_System_Backend\\obj\\",
+        "outputPath": "C:\\HR_System_Backend-master\\hr_system_backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

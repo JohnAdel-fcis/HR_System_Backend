@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uwAlCSQmn8cN40vAXWrkLqYyxzTFUyFqSwn20dmCJoAKI3hDIxiPPHyKXl/Qrxm0DByXCsi6I6j3lmKL2ZP58A==",
+  "dgSpecHash": "dozP237RlEq6tPRF+kNUTmoHz66awf67k01UngC0eNs9VbaNw/X83YAaIldP7P2sYa98k5DWVA0LH22EsbfwHg==",
   "success": true,
-  "projectFilePath": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
+  "projectFilePath": "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\John.Adel\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",

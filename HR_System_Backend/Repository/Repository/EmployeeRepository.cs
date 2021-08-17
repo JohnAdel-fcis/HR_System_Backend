@@ -324,7 +324,7 @@ namespace HR_System_Backend.Repository.Repository
             try
             {
 
-                var emplyees = await _context.Employees.Where(e => e.Id == id).Select(x => new EmployeeResponse
+                var emplyees = await _context.Employees.Include(x=>x.Holiday).Include(x=>x.WorkDay).Where(e => e.Id == id).Select(x => new EmployeeResponse
                 {
                     id = x.Id,
                     name = x.Name,
@@ -342,7 +342,27 @@ namespace HR_System_Backend.Repository.Repository
                     timeOut = x.TimeOut.Value.ToString(@"hh\:mm"),
                     baseTime = x.BaseTime,
                     createdDate = x.CreateDate,
-                    departmentId = x.DepartmentId
+                    departmentId = x.DepartmentId,
+                    holiday=new Week {
+                        Saturday=x.Holiday.Saturday,
+                        Sunday=x.Holiday.Sunday,
+                        Monday=x.Holiday.Monday,
+                        Tuesday=x.Holiday.Tuesday,
+                        Wednesday=x.Holiday.Wednesday,
+                        Thursday=x.Holiday.Thursday,
+                        Friday=x.Holiday.Friday
+                    },
+                    workDays=new Week {
+                        Saturday=x.WorkDay.Saturday,
+                        Sunday=x.WorkDay.Sunday,
+                        Monday=x.WorkDay.Monday,
+                        Tuesday=x.WorkDay.Tuesday,
+                        Wednesday=x.WorkDay.Wednesday,
+                        Thursday=x.WorkDay.Thursday,
+                        Friday=x.WorkDay.Friday
+                    },
+
+
                 }).ToListAsync();
 
                 if (emplyees.Count == 0)
@@ -366,7 +386,7 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-
+        
 
 
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
@@ -430,6 +450,9 @@ namespace HR_System_Backend.Repository.Repository
             return response;
 
         }
+
+
+
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeResponse emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -491,6 +514,8 @@ namespace HR_System_Backend.Repository.Repository
             return response;
 
         }
+
+         
 
     }
 }
