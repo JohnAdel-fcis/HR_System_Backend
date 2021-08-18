@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dozP237RlEq6tPRF+kNUTmoHz66awf67k01UngC0eNs9VbaNw/X83YAaIldP7P2sYa98k5DWVA0LH22EsbfwHg==",
+  "dgSpecHash": "uwAlCSQmn8cN40vAXWrkLqYyxzTFUyFqSwn20dmCJoAKI3hDIxiPPHyKXl/Qrxm0DByXCsi6I6j3lmKL2ZP58A==",
   "success": true,
-  "projectFilePath": "C:\\HR_System_Backend-master\\hr_system_backend\\HR_System_Backend.csproj",
+  "projectFilePath": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\John.Adel\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
@@ -180,10 +180,10 @@
     "C:\\Users\\John.Adel\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512"
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512",
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512"
   ],
   "logs": []
 }
