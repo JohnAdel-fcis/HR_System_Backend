@@ -488,3 +488,4 @@ C:\HR_System_Backend-master\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_
 C:\HR_System_Backend-master\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.dll
 C:\HR_System_Backend-master\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.pdb
 C:\HR_System_Backend-master\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.genruntimeconfig.cache
+C:\HR_System_Backend-master\HR_System_Backend\bin\Debug\netcoreapp3.1\Interop.zkemkeeper.dll

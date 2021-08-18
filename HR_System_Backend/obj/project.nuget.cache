@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "uwAlCSQmn8cN40vAXWrkLqYyxzTFUyFqSwn20dmCJoAKI3hDIxiPPHyKXl/Qrxm0DByXCsi6I6j3lmKL2ZP58A==",
+  "dgSpecHash": "EDj/gnDjLxhrOFwTgBbXNa6QJEA2BkbxLwlgsvoqKJf0/Ug/1lXnMmEuqsChyE0cUQz7dHZwG7EvnlhaKj0+LQ==",
   "success": true,
   "projectFilePath": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
   "expectedPackageFiles": [
@@ -180,10 +180,22 @@
     "C:\\Users\\John.Adel\\.nuget\\packages\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512",
+    "C:\\Users\\John.Adel\\.nuget\\packages\\zkemkeeper\\1.0.2\\zkemkeeper.1.0.2.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'ZKemkeeper 1.0.2' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v3.1'. This package may not be fully compatible with your project.",
+      "libraryId": "ZKemkeeper",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    }
+  ]
 }
