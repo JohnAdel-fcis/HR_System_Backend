@@ -1,4 +1,5 @@
 ﻿using HR_System_Backend.Model.Helper;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,5 +31,6 @@ namespace HR_System_Backend.Model.Input
         public int? shiftId { get; set; }
         public Week holiday { get; set; }
         public Week workDays { get; set; }
+        public List<string> documents { get; set; }
     }
 }

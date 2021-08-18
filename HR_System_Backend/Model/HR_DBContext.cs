@@ -264,6 +264,7 @@ namespace HR_System_Backend.Model
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Documents)
                     .HasForeignKey(d => d.EmployeeId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__DOCUMENT__EMPLOY__3D5E1FD2");
             });
 

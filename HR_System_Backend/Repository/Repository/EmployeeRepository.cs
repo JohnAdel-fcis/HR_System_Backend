@@ -3,11 +3,15 @@ using HR_System_Backend.Model.Helper;
 using HR_System_Backend.Model.Input;
 using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace HR_System_Backend.Repository.Repository
 {
@@ -28,28 +32,40 @@ namespace HR_System_Backend.Repository.Repository
                 var resp = await ValidateEmployee(_context, emp);
                 if (!resp.status)
                     return resp;
-                var holiday = new Holiday
-                {
-                    Saturday = emp.holiday.Saturday,
-                    Sunday = emp.holiday.Sunday,
-                    Monday = emp.holiday.Monday,
-                    Tuesday = emp.holiday.Tuesday,
-                    Wednesday = emp.holiday.Wednesday,
-                    Thursday = emp.holiday.Thursday,
-                    Friday = emp.holiday.Friday
 
-                };
-                var workDays = new WorkDay
-                {
-                    Saturday = emp.workDays.Saturday,
-                    Sunday = emp.workDays.Sunday,
-                    Monday = emp.workDays.Monday,
-                    Tuesday = emp.workDays.Tuesday,
-                    Wednesday = emp.workDays.Wednesday,
-                    Thursday = emp.workDays.Thursday,
-                    Friday = emp.workDays.Friday
+                Holiday holiday = null;
+                WorkDay workDays = null;
 
-                };
+                if (emp.holiday != null)
+                {
+                    holiday = new Holiday
+                    {
+                        Saturday = emp.holiday.Saturday,
+                        Sunday = emp.holiday.Sunday,
+                        Monday = emp.holiday.Monday,
+                        Tuesday = emp.holiday.Tuesday,
+                        Wednesday = emp.holiday.Wednesday,
+                        Thursday = emp.holiday.Thursday,
+                        Friday = emp.holiday.Friday
+
+                    };
+                }
+                if (emp.workDays != null)
+                {
+                    workDays = new WorkDay
+                    {
+                        Saturday = emp.workDays.Saturday,
+                        Sunday = emp.workDays.Sunday,
+                        Monday = emp.workDays.Monday,
+                        Tuesday = emp.workDays.Tuesday,
+                        Wednesday = emp.workDays.Wednesday,
+                        Thursday = emp.workDays.Thursday,
+                        Friday = emp.workDays.Friday
+
+                    };
+                }
+
+
                 var employee = new Employee
                 {
                     Name = emp.name,
@@ -74,6 +90,19 @@ namespace HR_System_Backend.Repository.Repository
 
                 await _context.Employees.AddAsync(employee);
                 await _context.SaveChangesAsync();
+                var paths = SaveDocuments(emp.documents, employee.Id);
+                foreach (var path in paths)
+                {
+                    employee.Documents.Add(new Document
+                    {
+                        DocumentPath = path,
+                        DocumentName = "FileName",
+                        UploadDate = DateTime.Now,
+                        AddedBy = "User"
+                    });
+                }
+                await _context.SaveChangesAsync();
+
                 var employeeResponse = new EmployeeResponse
                 {
                     id = employee.Id,
@@ -104,10 +133,10 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 response.status = false;
-                response.message = "حدث خطأ";
+                response.message = ex.Message;
                 return response;
             }
         }
@@ -117,7 +146,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Where(x => x.Id == id).FirstOrDefaultAsync();
+                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (emp == null)
                 {
                     response.status = false;
@@ -126,6 +155,14 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 _context.Employees.Remove(emp);
                 await _context.SaveChangesAsync();
+
+
+
+                Directory.Delete("documents/" + id.ToString(), true);
+
+
+
+
                 response.status = true;
                 response.message = "تم ازالة الموظف بنجاح";
                 return response;
@@ -159,7 +196,7 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     return resp;
                 }
-                if (employee.Holiday==null)
+                if (employee.Holiday == null)
                 {
                     employee.Holiday = new Holiday();
                 }
@@ -324,7 +361,7 @@ namespace HR_System_Backend.Repository.Repository
             try
             {
 
-                var emplyees = await _context.Employees.Include(x=>x.Holiday).Include(x=>x.WorkDay).Where(e => e.Id == id).Select(x => new EmployeeResponse
+                var emplyees = await _context.Employees.Include(x => x.Holiday).Include(x => x.WorkDay).Where(e => e.Id == id).Select(x => new EmployeeResponse
                 {
                     id = x.Id,
                     name = x.Name,
@@ -343,23 +380,25 @@ namespace HR_System_Backend.Repository.Repository
                     baseTime = x.BaseTime,
                     createdDate = x.CreateDate,
                     departmentId = x.DepartmentId,
-                    holiday=new Week {
-                        Saturday=x.Holiday.Saturday,
-                        Sunday=x.Holiday.Sunday,
-                        Monday=x.Holiday.Monday,
-                        Tuesday=x.Holiday.Tuesday,
-                        Wednesday=x.Holiday.Wednesday,
-                        Thursday=x.Holiday.Thursday,
-                        Friday=x.Holiday.Friday
+                    holiday = new Week
+                    {
+                        Saturday = x.Holiday.Saturday,
+                        Sunday = x.Holiday.Sunday,
+                        Monday = x.Holiday.Monday,
+                        Tuesday = x.Holiday.Tuesday,
+                        Wednesday = x.Holiday.Wednesday,
+                        Thursday = x.Holiday.Thursday,
+                        Friday = x.Holiday.Friday
                     },
-                    workDays=new Week {
-                        Saturday=x.WorkDay.Saturday,
-                        Sunday=x.WorkDay.Sunday,
-                        Monday=x.WorkDay.Monday,
-                        Tuesday=x.WorkDay.Tuesday,
-                        Wednesday=x.WorkDay.Wednesday,
-                        Thursday=x.WorkDay.Thursday,
-                        Friday=x.WorkDay.Friday
+                    workDays = new Week
+                    {
+                        Saturday = x.WorkDay.Saturday,
+                        Sunday = x.WorkDay.Sunday,
+                        Monday = x.WorkDay.Monday,
+                        Tuesday = x.WorkDay.Tuesday,
+                        Wednesday = x.WorkDay.Wednesday,
+                        Thursday = x.WorkDay.Thursday,
+                        Friday = x.WorkDay.Friday
                     },
 
 
@@ -386,7 +425,7 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-        
+
 
 
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
@@ -515,7 +554,49 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-         
+        private List<string> SaveDocuments(List<string> documents, int empId)
+        {
+            List<string> paths = new List<string>();
+            foreach (var item in documents)
+            {
+
+                /////////////////// create Folder For each employee ///////////////////////////////////////////////////////////////////////
+                string path = @"documents/" + empId.ToString();
+
+
+                // Create directory temp1 if it doesn't exist
+                Directory.CreateDirectory(path);
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+                //////////////////////////*Generate id for each image*////////////////////////////////////////
+                string newImageId;
+                newImageId = Guid.NewGuid().ToString();
+                path = path + "/" + newImageId + ".jpg";
+                ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+                /////////////////////////////////////////*** Convert base64 to image and save it ***//////////////////////////////////////
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    byte[] bytes = Convert.FromBase64String(item);
+                    MemoryStream stream = new MemoryStream(bytes);
+                    ImageConverter v = new ImageConverter();
+
+                    //IFormFile file = new FormFile(stream, 0, bytes.Length, eqp.Name, eqp.Name);
+                    IFormFile file = new FormFile(stream, 0, bytes.Length, "fileName", "fileName");
+
+                    file.CopyTo(fileStream);
+                }
+                paths.Add(path);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            }
+            return paths;
+        }
 
     }
 }
