@@ -2,7 +2,7 @@ namespace HR_System_Backend.Model.Helper
 {
     public class EmpInfoFinger
     {
-          public string idwEnrollNumber { get; set; }
+        public string idwEnrollNumber { get; set; }
         public int idwVerifyMode { get; set; }
         public int idwInOutMode { get; set; }
         public int year { get; set; }

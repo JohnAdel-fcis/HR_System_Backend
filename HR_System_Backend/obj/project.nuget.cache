@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "EDj/gnDjLxhrOFwTgBbXNa6QJEA2BkbxLwlgsvoqKJf0/Ug/1lXnMmEuqsChyE0cUQz7dHZwG7EvnlhaKj0+LQ==",
+  "dgSpecHash": "4jK3M6OHsNMc/ue9dpWLrzBVPqYbwRx5BkdD3s1KhXGjVIvi5BfuIxH6DoGVRwLNxqj8S0SdzS7ZB2P44yZR9Q==",
   "success": true,
   "projectFilePath": "C:\\HR_System_Backend-master\\HR_System_Backend\\HR_System_Backend.csproj",
   "expectedPackageFiles": [
@@ -181,10 +181,10 @@
     "C:\\Users\\John.Adel\\.nuget\\packages\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmlserializer\\4.3.0\\system.xml.xmlserializer.4.3.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\zkemkeeper\\1.0.2\\zkemkeeper.1.0.2.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512"
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512"
   ],
   "logs": [
     {

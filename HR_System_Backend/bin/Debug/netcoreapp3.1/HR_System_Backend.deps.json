@@ -19,7 +19,7 @@
       "NETCOREAPP3_1_OR_GREATER"
     ],
     "languageVersion": "8.0",
-    "platform": "",
+    "platform": "x64",
     "allowUnsafe": false,
     "warningsAsErrors": false,
     "optimize": false,
@@ -33,6 +33,7 @@
       "HR_System_Backend/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "3.1.9",
+          "Microsoft.EntityFrameworkCore.Design": "5.0.9",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.9",
           "Microsoft.EntityFrameworkCore.Sqlite": "3.1.15",
           "Microsoft.EntityFrameworkCore.Tools": "5.0.9",

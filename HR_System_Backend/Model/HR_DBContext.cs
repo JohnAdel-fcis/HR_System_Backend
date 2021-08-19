@@ -25,6 +25,7 @@ namespace HR_System_Backend.Model
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<FingerLog> FingerLogs { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
         public virtual DbSet<OverTime> OverTimes { get; set; }
         public virtual DbSet<SalaryType> SalaryTypes { get; set; }
@@ -36,8 +37,8 @@ namespace HR_System_Backend.Model
         {
             if (!optionsBuilder.IsConfigured)
             {
-/* #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-0B4I9QK\\SQLEXPRESS;Database=HR_DB;Trusted_Connection=True;"); */
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=PHS-IT53\\;Database=HR_DB;Trusted_Connection=True;");
             }
         }
 
@@ -264,7 +265,6 @@ namespace HR_System_Backend.Model
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Documents)
                     .HasForeignKey(d => d.EmployeeId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__DOCUMENT__EMPLOY__3D5E1FD2");
             });
 
@@ -286,9 +286,7 @@ namespace HR_System_Backend.Model
 
                 entity.Property(e => e.CategoryId).HasColumnName("CATEGORY_ID");
 
-                entity.Property(e => e.Code)
-                    .HasMaxLength(50)
-                    .HasColumnName("CODE");
+                entity.Property(e => e.Code).HasColumnName("CODE");
 
                 entity.Property(e => e.CreateDate)
                     .HasColumnType("date")
@@ -343,6 +341,33 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.ShiftId)
                     .HasConstraintName("FK__EMPLOYEE__SHIFT___4BAC3F29");
+            });
+
+            modelBuilder.Entity<FingerLog>(entity =>
+            {
+                entity.HasKey(e => e.LogId)
+                    .HasName("PK__FINGER_L__4364C882284553C2");
+
+                entity.ToTable("FINGER_LOGS");
+
+                entity.Property(e => e.LogId).HasColumnName("LOG_ID");
+
+                entity.Property(e => e.Code).HasColumnName("CODE");
+
+                entity.Property(e => e.EmpId).HasColumnName("EMP_ID");
+
+                entity.Property(e => e.InOut).HasColumnName("IN_OUT");
+
+                entity.Property(e => e.LogDate)
+                    .HasColumnType("date")
+                    .HasColumnName("LOG_DATE");
+
+                entity.Property(e => e.LogTime).HasColumnName("LOG_TIME");
+
+                entity.HasOne(d => d.Emp)
+                    .WithMany(p => p.FingerLogs)
+                    .HasForeignKey(d => d.EmpId)
+                    .HasConstraintName("FK__FINGER_LO__EMP_I__756D6ECB");
             });
 
             modelBuilder.Entity<Holiday>(entity =>

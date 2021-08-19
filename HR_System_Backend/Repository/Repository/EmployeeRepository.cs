@@ -90,18 +90,26 @@ namespace HR_System_Backend.Repository.Repository
 
                 await _context.Employees.AddAsync(employee);
                 await _context.SaveChangesAsync();
-                var paths = SaveDocuments(emp.documents, employee.Id);
-                foreach (var path in paths)
+                if (emp.documents != null)
                 {
-                    employee.Documents.Add(new Document
+                    if (emp.documents.Count >0)
                     {
-                        DocumentPath = path,
-                        DocumentName = "FileName",
-                        UploadDate = DateTime.Now,
-                        AddedBy = "User"
-                    });
+                         var paths = SaveDocuments(emp.documents, employee.Id);
+                    foreach (var path in paths)
+                    {
+                        employee.Documents.Add(new Document
+                        {
+                            DocumentPath = path,
+                            DocumentName = "FileName",
+                            UploadDate = DateTime.Now,
+                            AddedBy = "User"
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                    }
+                   
                 }
-                await _context.SaveChangesAsync();
+                
 
                 var employeeResponse = new EmployeeResponse
                 {
@@ -157,8 +165,12 @@ namespace HR_System_Backend.Repository.Repository
                 await _context.SaveChangesAsync();
 
 
-
-                Directory.Delete("documents/" + id.ToString(), true);
+                var exist = Directory.Exists("documents/" + id.ToString());
+                if (exist)
+                {
+                    Directory.Delete("documents/" + id.ToString(), true);
+                }
+                
 
 
 

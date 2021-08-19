@@ -88,6 +88,7 @@ namespace HR_System_Backend
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<IShiftRepository, ShiftRepository>();
             services.AddTransient<IDebitRepository, DebitRepository>();
+            services.AddTransient<IFingerRepository, FingerRepository>();
 
         }
 

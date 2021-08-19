@@ -13,11 +13,12 @@ namespace HR_System_Backend.Model
             Covenants = new HashSet<Covenant>();
             Debits = new HashSet<Debit>();
             Documents = new HashSet<Document>();
+            FingerLogs = new HashSet<FingerLog>();
             WorkTimes = new HashSet<WorkTime>();
         }
 
         public int Id { get; set; }
-        public string Code { get; set; }
+        public int? Code { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string Email { get; set; }
@@ -45,6 +46,7 @@ namespace HR_System_Backend.Model
         public virtual ICollection<Covenant> Covenants { get; set; }
         public virtual ICollection<Debit> Debits { get; set; }
         public virtual ICollection<Document> Documents { get; set; }
+        public virtual ICollection<FingerLog> FingerLogs { get; set; }
         public virtual ICollection<WorkTime> WorkTimes { get; set; }
     }
 }
