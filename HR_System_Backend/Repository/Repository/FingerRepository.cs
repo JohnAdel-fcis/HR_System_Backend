@@ -23,13 +23,27 @@ namespace HR_System_Backend.Repository.Repository
         public async Task<Response<EmpInfoFinger>> GetLogsFromDevice(FingerGetAllInput input)
         {
             var response = GetLogs(input);
+            var data = response.data.OrderBy(x => x.LogDate);
             if (!response.status)
             {
                 return response;
             }
+            else
+            {
+                response.status = true;
+                response.message = "تم حفظ البيانات بنجاح";
+                response.data = data.ToList();
+                return response;
+            }
+
+        }
+
+        public async Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input)
+        {
+            var response = new Response<bool>();
             try
             {
-                var data = response.data;
+                var data = input.OrderBy(x => x.LogDate);
                 var CodeNoEmp = new List<int>();
                 var Old = new EmpInfoFinger();
                 foreach (var item in data)
@@ -43,14 +57,14 @@ namespace HR_System_Backend.Repository.Repository
                     emp.FingerLogs.Add(new FingerLog
                     {
                         Code = item.idwEnrollNumber,
-                        LogDate = new DateTime(item.year, item.month, item.day),
-                        LogTime = new TimeSpan(item.hour, item.minute, item.second),
+                        LogDate = item.LogDate,
+                        LogTime = item.LogTime,
                         InOut = item.idwInOutMode
                     });
-                    var date = new DateTime(item.year, item.month, item.day);
-                    var timeIn = new TimeSpan(item.hour, item.minute, item.second);
+                    var date = item.LogDate;
+                    var time = item.LogTime;
                     var workTime = emp.WorkTimes.Where(x => x.WorkDate == date).FirstOrDefault();
-
+                    // var test = _context.FingerLogs.Where(x => (x.LogDate == date && x.InOut == 0)).LastOrDefault();
                     if (workTime == null)
                     {
                         if (item.idwInOutMode == 0)
@@ -58,7 +72,7 @@ namespace HR_System_Backend.Repository.Repository
                             emp.WorkTimes.Add(new WorkTime
                             {
                                 WorkDate = date,
-                                WorkStart = timeIn
+                                WorkStart = time
                             });
                         }
                         else
@@ -66,7 +80,7 @@ namespace HR_System_Backend.Repository.Repository
                             emp.WorkTimes.Add(new WorkTime
                             {
                                 WorkDate = date,
-                                WorkEnd = timeIn
+                                WorkEnd = time
                             });
                         }
 
@@ -75,52 +89,31 @@ namespace HR_System_Backend.Repository.Repository
                     {
                         if (item.idwInOutMode == 0)
                         {
-                            workTime.WorkStart = timeIn;
+                            workTime.WorkStart = time;
                         }
                         else
                         {
-                            workTime.WorkEnd = timeIn;
+                            workTime.WorkEnd = time;
                         }
                     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    await _context.SaveChangesAsync();
                 }
-                await _context.SaveChangesAsync();
-                response.status = true ;
-                response.message="تم حفظ البيانات بنجاح";
-                return response ;
+                var emps = _context.Employees.ToList();
+
+                response.status = true;
+                response.message = "تم سحب البيانات من الجهاز بنجاح";
+                return response;
             }
             catch (Exception ex)
             {
 
-               response.status= false ; 
-               response.message = ex.Message ;
-               return response ;
+                response.status = false;
+                response.message = ex.Message;
+                return response;
             }
 
         }
-
-
 
 
         public Response<bool> SetUserFinger(int userId, string name, FingerGetAllInput input, string password = "")
@@ -156,7 +149,6 @@ namespace HR_System_Backend.Repository.Repository
 
 
 
-
         public async Task<Response<GetUserInfoResponse>> GetUsersInfoFromDevice(FingerGetAllInput input)
         {
             var response = GetUsersInfo(input);
@@ -166,20 +158,8 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     return response;
                 }
-                foreach (var item in response.data)
-                {
-                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id)).FirstOrDefault();
-                    if (exist != null)
-                    {
-                        var emp = new Employee
-                        {
-                            Name = item.name,
-                            Code = Int32.Parse(item.id)
-                        };
-                        _context.Employees.Add(emp);
-                    }
-                }
-                await _context.SaveChangesAsync();
+                response.status = true;
+                response.message = "تم سحب البيانات من الجهاز بنجاح";
                 return response;
             }
             catch (Exception ex)
@@ -192,7 +172,43 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
+        public async Task<Response<bool>> SaveUsersInfoToDb(List<GetUserInfoResponse> input)
+        {
+            var response = new Response<bool>();
+            try
+            {
+                if (input.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "برجاء اضافه موظفين";
+                    return response;
+                }
+                foreach (var item in input)
+                {
+                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id)).FirstOrDefault();
+                    if (exist == null)
+                    {
+                        var emp = new Employee
+                        {
+                            Name = item.name,
+                            Code = Int32.Parse(item.id)
+                        };
+                        _context.Employees.Add(emp);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+                response.status = true;
+                response.message = "تم حفظ البيانات بنجاح";
+                return response;
+            }
+            catch (Exception ex)
+            {
 
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+        }
 
         private Response<EmpInfoFinger> GetLogs(FingerGetAllInput input)
         {
@@ -202,12 +218,10 @@ namespace HR_System_Backend.Repository.Repository
             int iMachineNumber = 1;
             try
             {
-
                 int idwErrorCode = 0;
                 bIsConnected = axCZKEM1.Connect_Net(input.ip, Convert.ToInt32(input.port));
                 if (bIsConnected == true)
                 {
-
                     iMachineNumber = 1;//In fact,when you are using the tcp/ip communication,this parameter will be ignored,that is any integer will all right.Here we use 1.
                     axCZKEM1.RegEvent(iMachineNumber, 65535);//Here you can register the realtime events that you want to be triggered(the parameters 65535 means registering all)
                 }
@@ -222,8 +236,6 @@ namespace HR_System_Backend.Repository.Repository
                     return response;
 
                 }
-
-
                 string sdwEnrollNumber = "";
                 int idwVerifyMode = 0;
                 int idwInOutMode = 0;
@@ -236,27 +248,21 @@ namespace HR_System_Backend.Repository.Repository
                 int idwWorkcode = 0;
                 int idwErrorCode2 = 0;
 
-
-
                 axCZKEM1.EnableDevice(iMachineNumber, false);//disable the device
                 List<EmpInfoFinger> userList = new List<EmpInfoFinger>();
                 if (axCZKEM1.ReadGeneralLogData(iMachineNumber))//read all the attendance records to the memory
 
                 {
                     while (axCZKEM1.SSR_GetGeneralLogData(iMachineNumber, out sdwEnrollNumber, out idwVerifyMode,
-                               out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))//get records from the memory
+                           out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))//get records from the memory
                     {
                         userList.Add(new EmpInfoFinger
                         {
                             idwEnrollNumber = Int32.Parse(sdwEnrollNumber),
                             idwVerifyMode = idwVerifyMode,
                             idwInOutMode = idwInOutMode,
-                            year = idwYear,
-                            month = idwMonth,
-                            day = idwDay,
-                            hour = idwHour,
-                            minute = idwMinute,
-                            second = idwSecond
+                            LogDate = new DateTime(idwYear, idwMonth, idwDay),
+                            LogTime = new TimeSpan(idwHour, idwMinute, idwSecond)
                         });
                     }
                     axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
@@ -267,7 +273,6 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 else
                 {
-
                     axCZKEM1.GetLastError(ref idwErrorCode2);
 
                     if (idwErrorCode != 0)
@@ -285,7 +290,6 @@ namespace HR_System_Backend.Repository.Repository
                         return response;
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -293,9 +297,12 @@ namespace HR_System_Backend.Repository.Repository
                 response.status = false;
                 response.message = "   حدث خطأ  " + ex.Message;
                 return response;
-
             }
         }
+
+
+
+
         private Response<GetUserInfoResponse> GetUsersInfo(FingerGetAllInput input)
         {
             var response = new Response<GetUserInfoResponse>();
@@ -369,5 +376,9 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+
+
+
+        
     }
 }

@@ -1,8 +1,10 @@
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HR_System_Backend.Model;
+using HR_System_Backend.Model.Helper;
 using HR_System_Backend.Model.Input;
 using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
@@ -101,5 +103,34 @@ namespace HR_System_Backend.Controllers
 
 
         }
+
+
+
+        [HttpPost]
+        [Route("SaveUsersDb")]
+        public async Task<IActionResult> SaveUsersDb(List<GetUserInfoResponse> input)
+        {
+            try
+            {
+                var response = await Irepo.SaveUsersInfoToDb(input);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
     }
 }
