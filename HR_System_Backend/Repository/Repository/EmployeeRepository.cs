@@ -32,10 +32,45 @@ namespace HR_System_Backend.Repository.Repository
                 var resp = await ValidateEmployee(_context, emp);
                 if (!resp.status)
                     return resp;
+             
+                
+                //Get The best code
+                var codes = await _context.Employees.Where(s => s.DeviceId == emp.deviceId).Select(x => x.Code).ToListAsync();
+                codes.Sort();
+                int newCode = 1;
+                foreach (var code in codes)
+                {
+                    if (code != newCode)
+                    {
+                        break;
+                    }
+                    newCode++;
+                }
+                /////////////////////
+                
+
+
+
+
+
+                //Save The Employe To FingerPrint Device
+                var device = _context.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefault();
+                var fingerRepo = new FingerRepository(_context);
+                var saveUserResponse = fingerRepo.SetUserFinger(newCode, emp.name,emp.roleId.Value , new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, emp.password);
+                if (saveUserResponse.status == false)
+                {
+                    response.status = false;
+                    response.message = saveUserResponse.message;
+                    return response;
+                }
+                //////////////////////////////////////////
+                
+
+
+
 
                 Holiday holiday = null;
                 WorkDay workDays = null;
-
                 if (emp.holiday != null)
                 {
                     holiday = new Holiday
@@ -64,8 +99,6 @@ namespace HR_System_Backend.Repository.Repository
 
                     };
                 }
-
-
                 var employee = new Employee
                 {
                     Name = emp.name,
@@ -85,31 +118,34 @@ namespace HR_System_Backend.Repository.Repository
                     SalaryTypeId = emp.salaryId,
                     ShiftId = emp.shiftId,
                     Holiday = holiday,
-                    WorkDay = workDays
+                    WorkDay = workDays,
+                    Code = newCode,
+                    DeviceId = emp.deviceId,
+                    RoleId = emp.roleId
                 };
 
                 await _context.Employees.AddAsync(employee);
                 await _context.SaveChangesAsync();
                 if (emp.documents != null)
                 {
-                    if (emp.documents.Count >0)
+                    if (emp.documents.Count > 0)
                     {
-                         var paths = SaveDocuments(emp.documents, employee.Id);
-                    foreach (var path in paths)
-                    {
-                        employee.Documents.Add(new Document
+                        var paths = SaveDocuments(emp.documents, employee.Id);
+                        foreach (var path in paths)
                         {
-                            DocumentPath = path,
-                            DocumentName = "FileName",
-                            UploadDate = DateTime.Now,
-                            AddedBy = "User"
-                        });
+                            employee.Documents.Add(new Document
+                            {
+                                DocumentPath = path,
+                                DocumentName = "FileName",
+                                UploadDate = DateTime.Now,
+                                AddedBy = "User"
+                            });
+                        }
+                        await _context.SaveChangesAsync();
                     }
-                    await _context.SaveChangesAsync();
-                    }
-                   
+
                 }
-                
+
 
                 var employeeResponse = new EmployeeResponse
                 {
@@ -151,6 +187,7 @@ namespace HR_System_Backend.Repository.Repository
 
         public async Task<Response<EmployeeResponse>> DeleteEmployee(int id)
         {
+            var fingerRepo = new FingerRepository(_context);
             var response = new Response<EmployeeResponse>();
             try
             {
@@ -161,6 +198,15 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "الموظف غير موجود";
                     return response;
                 }
+                var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), emp.Device);
+                if (!deleteFromDeviceResponse.status)
+                {
+                    response.status = false;
+                    response.message = deleteFromDeviceResponse.message;
+                    return response;
+                }
+
+
                 _context.Employees.Remove(emp);
                 await _context.SaveChangesAsync();
 
@@ -170,7 +216,7 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     Directory.Delete("documents/" + id.ToString(), true);
                 }
-                
+
 
 
 

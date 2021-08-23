@@ -12,7 +12,7 @@
       "NETCOREAPP3_1"
     ],
     "languageVersion": "",
-    "platform": "x86",
+    "platform": "AnyCPU",
     "allowUnsafe": false,
     "warningsAsErrors": false,
     "optimize": false,

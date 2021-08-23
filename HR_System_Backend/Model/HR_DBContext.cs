@@ -23,11 +23,15 @@ namespace HR_System_Backend.Model
         public virtual DbSet<Debit> Debits { get; set; }
         public virtual DbSet<DebitTransaction> DebitTransactions { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Device> Devices { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<FingerLog> FingerLogs { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
+        public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemTransaction> ItemTransactions { get; set; }
         public virtual DbSet<OverTime> OverTimes { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<SalaryType> SalaryTypes { get; set; }
         public virtual DbSet<Shift> Shifts { get; set; }
         public virtual DbSet<WorkDay> WorkDays { get; set; }
@@ -38,7 +42,7 @@ namespace HR_System_Backend.Model
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=PHS-IT53\\;Database=HR_DB;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-0B4I9QK\\SQLExpress;Database=HR_DB;Trusted_Connection=True;");
             }
         }
 
@@ -238,6 +242,21 @@ namespace HR_System_Backend.Model
                     .HasColumnName("DEPARTMENT_NAME");
             });
 
+            modelBuilder.Entity<Device>(entity =>
+            {
+                entity.ToTable("DEVICES");
+
+                entity.Property(e => e.DeviceId).HasColumnName("DEVICE_ID");
+
+                entity.Property(e => e.DeviceIp)
+                    .HasMaxLength(30)
+                    .HasColumnName("DEVICE_IP");
+
+                entity.Property(e => e.DevicePort)
+                    .HasMaxLength(10)
+                    .HasColumnName("DEVICE_PORT");
+            });
+
             modelBuilder.Entity<Document>(entity =>
             {
                 entity.ToTable("DOCUMENT");
@@ -294,6 +313,8 @@ namespace HR_System_Backend.Model
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DEPARTMENT_ID");
 
+                entity.Property(e => e.DeviceId).HasColumnName("DEVICE_ID");
+
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
                     .HasColumnName("EMAIL");
@@ -309,6 +330,12 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.Phone)
                     .HasMaxLength(20)
                     .HasColumnName("PHONE");
+
+                entity.Property(e => e.Productivity)
+                    .HasColumnName("PRODUCTIVITY")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.RoleId).HasColumnName("ROLE_ID");
 
                 entity.Property(e => e.Salary)
                     .HasColumnType("decimal(18, 2)")
@@ -331,6 +358,16 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.DepartmentId)
                     .HasConstraintName("FK__EMPLOYEE__DEPART__25869641");
+
+                entity.HasOne(d => d.Device)
+                    .WithMany(p => p.Employees)
+                    .HasForeignKey(d => d.DeviceId)
+                    .HasConstraintName("FK__EMPLOYEE__DEVICE__2CBDA3B5");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Employees)
+                    .HasForeignKey(d => d.RoleId)
+                    .HasConstraintName("FK__EMPLOYEE__ROLE_I__2BC97F7C");
 
                 entity.HasOne(d => d.SalaryType)
                     .WithMany(p => p.Employees)
@@ -419,6 +456,64 @@ namespace HR_System_Backend.Model
                     .HasConstraintName("FK__HOLIDAYS__EMPLOY__3B40CD36");
             });
 
+            modelBuilder.Entity<Item>(entity =>
+            {
+                entity.ToTable("ITEMS");
+
+                entity.Property(e => e.ItemId).HasColumnName("ITEM_ID");
+
+                entity.Property(e => e.EmpId).HasColumnName("EMP_ID");
+
+                entity.Property(e => e.ItemCommission).HasColumnName("ITEM_COMMISSION");
+
+                entity.Property(e => e.ItemName)
+                    .HasMaxLength(100)
+                    .HasColumnName("ITEM_NAME");
+
+                entity.Property(e => e.ItemPrice).HasColumnName("ITEM_PRICE");
+
+                entity.Property(e => e.ItemQnty).HasColumnName("ITEM_QNTY");
+
+                entity.HasOne(d => d.Emp)
+                    .WithMany(p => p.Items)
+                    .HasForeignKey(d => d.EmpId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__ITEMS__EMP_ID__0880433F");
+            });
+
+            modelBuilder.Entity<ItemTransaction>(entity =>
+            {
+                entity.HasKey(e => e.TarnsId)
+                    .HasName("PK__ITEM_TRA__A513AD9D16CA8404");
+
+                entity.ToTable("ITEM_TRANSACTIONS");
+
+                entity.Property(e => e.TarnsId).HasColumnName("TARNS_ID");
+
+                entity.Property(e => e.EmpId).HasColumnName("EMP_ID");
+
+                entity.Property(e => e.ItemComissions).HasColumnName("ITEM_COMISSIONS");
+
+                entity.Property(e => e.ItemId).HasColumnName("ITEM_ID");
+
+                entity.Property(e => e.ItemQuantity).HasColumnName("ITEM_QUANTITY");
+
+                entity.Property(e => e.TransDate)
+                    .HasColumnType("date")
+                    .HasColumnName("TRANS_DATE");
+
+                entity.HasOne(d => d.Emp)
+                    .WithMany(p => p.ItemTransactions)
+                    .HasForeignKey(d => d.EmpId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__ITEM_TRAN__EMP_I__27F8EE98");
+
+                entity.HasOne(d => d.Item)
+                    .WithMany(p => p.ItemTransactions)
+                    .HasForeignKey(d => d.ItemId)
+                    .HasConstraintName("FK__ITEM_TRAN__ITEM___2704CA5F");
+            });
+
             modelBuilder.Entity<OverTime>(entity =>
             {
                 entity.ToTable("OVER_TIME");
@@ -440,6 +535,17 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.OverTimePercentage).HasColumnName("OVER_TIME_PERCENTAGE");
 
                 entity.Property(e => e.OverTimeTotal).HasColumnName("OVER_TIME_TOTAL");
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable("ROLE");
+
+                entity.Property(e => e.RoleId).HasColumnName("ROLE_ID");
+
+                entity.Property(e => e.RoleName)
+                    .HasMaxLength(50)
+                    .HasColumnName("ROLE_NAME");
             });
 
             modelBuilder.Entity<SalaryType>(entity =>

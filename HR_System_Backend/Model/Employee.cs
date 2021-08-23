@@ -14,6 +14,8 @@ namespace HR_System_Backend.Model
             Debits = new HashSet<Debit>();
             Documents = new HashSet<Document>();
             FingerLogs = new HashSet<FingerLog>();
+            ItemTransactions = new HashSet<ItemTransaction>();
+            Items = new HashSet<Item>();
             WorkTimes = new HashSet<WorkTime>();
         }
 
@@ -35,9 +37,14 @@ namespace HR_System_Backend.Model
         public int? CategoryId { get; set; }
         public int? SalaryTypeId { get; set; }
         public int? ShiftId { get; set; }
+        public bool? Productivity { get; set; }
+        public int? RoleId { get; set; }
+        public int? DeviceId { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual Department Department { get; set; }
+        public virtual Device Device { get; set; }
+        public virtual Role Role { get; set; }
         public virtual SalaryType SalaryType { get; set; }
         public virtual Shift Shift { get; set; }
         public virtual Holiday Holiday { get; set; }
@@ -47,6 +54,8 @@ namespace HR_System_Backend.Model
         public virtual ICollection<Debit> Debits { get; set; }
         public virtual ICollection<Document> Documents { get; set; }
         public virtual ICollection<FingerLog> FingerLogs { get; set; }
+        public virtual ICollection<ItemTransaction> ItemTransactions { get; set; }
+        public virtual ICollection<Item> Items { get; set; }
         public virtual ICollection<WorkTime> WorkTimes { get; set; }
     }
 }

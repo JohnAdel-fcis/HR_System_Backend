@@ -10,11 +10,12 @@ namespace HR_System_Backend.Repository.Interface
 {
     public interface IFingerRepository
     {
-
+        Task<Response<DeviceResponse>> GetAllDevices();
         Task<Response<EmpInfoFinger>> GetLogsFromDevice(FingerGetAllInput input);
-        Response<bool> SetUserFinger(int userId, string name, FingerGetAllInput input, string password = null);
+        Response<bool> SetUserFinger(int userId, string name, int role, FingerGetAllInput input, string password = null);
         Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input);
         Task<Response<bool>> SaveUsersInfoToDb(List<GetUserInfoResponse> input);
         Task<Response<GetUserInfoResponse>> GetUsersInfoFromDevice(FingerGetAllInput input);
+        Response<bool> DeleteUserFinger(int machineNum, string code, Device input);
     }
 }

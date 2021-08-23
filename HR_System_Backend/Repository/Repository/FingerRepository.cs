@@ -8,6 +8,8 @@ using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
 using System.Linq;
 using zkemkeeper;
+using Microsoft.EntityFrameworkCore;
+
 namespace HR_System_Backend.Repository.Repository
 {
     public class FingerRepository : IFingerRepository
@@ -116,14 +118,14 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-        public Response<bool> SetUserFinger(int userId, string name, FingerGetAllInput input, string password = "")
+        public Response<bool> SetUserFinger(int userId, string name, int role , FingerGetAllInput input, string password = "")
         {
             var response = new Response<bool>();
             var device = new CZKEM();
             var connected = device.Connect_Net(input.ip, Convert.ToInt32(input.port));
             if (connected)
             {
-                var added = device.SSR_SetUserInfo(1, userId.ToString(), name, password, 1, true);
+                var added = device.SSR_SetUserInfo(1, userId.ToString(), name, password, role, true);
                 if (added)
                 {
                     response.status = true;
@@ -146,8 +148,35 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
+        public Response<bool> DeleteUserFinger(int machineNum, string code , Device input)
+        {
+            var response = new Response<bool>();
+            var device = new CZKEM();
+            var connected = device.Connect_Net(input.DeviceIp, Convert.ToInt32(input.DevicePort));
+            if (connected)
+            {
+                var added = device.SSR_DeleteEnrollData( machineNum , code , 12 );
+                if (added)
+                {
+                    response.status = true;
+                    response.message = "Deleted succesfuly";
+                    return response;
+                }
+                else
+                {
+                    response.status = false;
+                    response.message = "Can't Delete the User";
+                    return response;
+                }
+            }
+            else
+            {
+                response.status = false;
+                response.message = "Can't connect the device";
+                return response;
+            }
 
-
+        }
 
         public async Task<Response<GetUserInfoResponse>> GetUsersInfoFromDevice(FingerGetAllInput input)
         {
@@ -210,19 +239,23 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+    
+
+
+
         private Response<EmpInfoFinger> GetLogs(FingerGetAllInput input)
         {
 
             var response = new Response<EmpInfoFinger>();
             var axCZKEM1 = new zkemkeeper.CZKEM();
-            
-           
-            
+
+
+
             bool bIsConnected = false;
             int iMachineNumber = 1;
             try
             {
-              
+
                 int idwErrorCode = 0;
                 bIsConnected = axCZKEM1.Connect_Net(input.ip, Convert.ToInt32(input.port));
                 if (bIsConnected == true)
@@ -268,9 +301,9 @@ namespace HR_System_Backend.Repository.Repository
                             idwEnrollNumber = Int32.Parse(sdwEnrollNumber),
                             idwVerifyMode = idwVerifyMode,
                             idwInOutMode = idwInOutMode,
-                            LogDate = new DateTime(idwYear, idwMonth, idwDay),
+                            LogDate = new DateTime(idwYear, idwMonth, idwDay).Date,
                             LogTime = new TimeSpan(idwHour, idwMinute, idwSecond),
-                            name=name
+                            name = name
                         });
                     }
                     axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
@@ -309,9 +342,7 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-
-
-        private Response<GetUserInfoResponse> GetUsersInfo(FingerGetAllInput input)
+        private Response<GetUserInfoResponse> GetUsersInfo(FingerGetAllInput input )
         {
             var response = new Response<GetUserInfoResponse>();
             var axCZKEM1 = new zkemkeeper.CZKEM();
@@ -384,9 +415,32 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+        public async Task<Response<DeviceResponse>> GetAllDevices()
+        {
+            var response = new Response<DeviceResponse>();
+            try
+            {
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort }).ToListAsync();
+                if (devices.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد اجهزه";
+                    return response;
+
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = devices;
+                return response;
 
 
-
-        
+            }
+            catch (Exception)
+            {
+                response.status = false;
+                response.message = "حدث خطأ";
+                return response;
+            }
+        }
     }
 }

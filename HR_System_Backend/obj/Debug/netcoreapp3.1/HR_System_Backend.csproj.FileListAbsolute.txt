@@ -804,7 +804,6 @@ E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\bin\Debug\netcoreapp3.1\
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\e_sqlite3.dll
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.csprojAssemblyReference.cache
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.MvcApplicationPartsAssemblyInfo.cs
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.MvcApplicationPartsAssemblyInfo.cache
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.AssemblyInfoInputs.cache
@@ -815,3 +814,4 @@ E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\staticwebassets\HR_System_Backend.StaticWebAssets.xml
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.dll
 E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.pdb
+E:\HRSystem\BackUps\HR_System_Backend\HR_System_Backend\obj\Debug\netcoreapp3.1\HR_System_Backend.csprojAssemblyReference.cache

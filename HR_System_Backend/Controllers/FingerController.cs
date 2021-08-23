@@ -25,9 +25,36 @@ namespace HR_System_Backend.Controllers
         }
 
 
+        [HttpGet]
+        [Route("GetDevices")]
+        public async Task<IActionResult> GetDevices()
+        {
+            try
+            {
+                var response = await Irepo.GetAllDevices();
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+
+        }
+
         [HttpPost]
-        [Route("GetAll")]
-        public async  Task<IActionResult> GetAll(FingerGetAllInput input )
+        [Route("GetAllLogs")]
+        public async  Task<IActionResult> GetAllLogs(FingerGetAllInput input )
         {
             try
             {
@@ -57,7 +84,7 @@ namespace HR_System_Backend.Controllers
         {
             try
             {
-                var response =  Irepo.SetUserFinger(userId, name, input, password);
+                var response =  Irepo.SetUserFinger(userId, name,1, input, password);
                 if (response.status)
                 {
                     return Ok(response);
@@ -131,6 +158,39 @@ namespace HR_System_Backend.Controllers
 
 
         }
+
+
+
+        [HttpPost]
+        [Route("SaveLogsDb")]
+        public async Task<IActionResult> SaveLogsDb(List<EmpInfoFinger> input)
+        {
+            try
+            {
+                var response = await Irepo.SaveLogsToDb(input);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+
+
+
+
 
     }
 }
