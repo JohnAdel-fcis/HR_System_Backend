@@ -187,6 +187,31 @@ namespace HR_System_Backend.Controllers
 
         }
 
+        [HttpPost]
+        [Route("AddDevice")]
+        public async Task<IActionResult> AddDevice(DeviceInput input)
+        {
+            try
+            {
+                var response = await Irepo.AddDevice(input);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
 
 
 

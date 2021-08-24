@@ -420,7 +420,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort }).ToListAsync();
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort,Priority=x.Priority }).ToListAsync();
                 if (devices.Count == 0)
                 {
                     response.status = false;
@@ -434,6 +434,34 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
 
 
+            }
+            catch (Exception)
+            {
+                response.status = false;
+                response.message = "حدث خطأ";
+                return response;
+            }
+        }
+
+        public async Task<Response<DeviceResponse>> AddDevice(DeviceInput input)
+        {
+            var response = new Response<DeviceResponse>();
+            try
+            {
+                var device = await _context.Devices.Where(x => (x.DevicePort == input.devicePort && x.DeviceIp == input.deviceIP)).FirstOrDefaultAsync();
+                if (device != null)
+                {
+                    response.status = false;
+                    response.message = "هذا الجهاز موجود";
+                    return response;
+                }
+                var newDevice = new Device { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority };
+                await _context.Devices.AddAsync(newDevice);
+                await _context.SaveChangesAsync();
+                response.status = true;
+                response.message = "تمت اضافة الجهاز بنجاح";
+                response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId });
+                return response;
             }
             catch (Exception)
             {

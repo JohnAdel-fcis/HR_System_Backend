@@ -17,5 +17,7 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<bool>> SaveUsersInfoToDb(List<GetUserInfoResponse> input);
         Task<Response<GetUserInfoResponse>> GetUsersInfoFromDevice(FingerGetAllInput input);
         Response<bool> DeleteUserFinger(int machineNum, string code, Device input);
+        Task<Response<DeviceResponse>> AddDevice(DeviceInput input);
+
     }
 }

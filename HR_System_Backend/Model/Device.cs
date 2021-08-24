@@ -15,6 +15,7 @@ namespace HR_System_Backend.Model
         public int DeviceId { get; set; }
         public string DeviceIp { get; set; }
         public string DevicePort { get; set; }
+        public int? Priority { get; set; }
 
         public virtual ICollection<Employee> Employees { get; set; }
     }

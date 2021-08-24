@@ -36,5 +36,6 @@ namespace HR_System_Backend.Model.Input
         [Required]
         public int? deviceId { get; set; }
         public string password { get; set; }
+        public bool productivity { get; set; }
     }
 }

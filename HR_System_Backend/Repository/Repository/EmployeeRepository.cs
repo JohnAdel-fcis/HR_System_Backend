@@ -490,8 +490,16 @@ namespace HR_System_Backend.Repository.Repository
         {
             var response = new Response<EmployeeResponse>();
 
-
-
+            ///////////////////////////////////////////////////////////////////////////
+            //check if  finger Device is existing
+            ///////////////////////////////////////////////////////////////////////////
+            var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
+            if (device == null)
+            {
+                response.status = false;
+                response.message = "جهاز البصمة غير موجود";
+                return response;
+            }
 
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
@@ -542,6 +550,10 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "الوردية غير  موجوده";
                 return response;
             }
+
+
+
+
 
             response.status = true;
             return response;
