@@ -23,19 +23,19 @@ namespace HR_System_Backend.Repository.Repository
             _context = context;
         }
 
-        public async Task<Response<EmployeeResponse>> AddEmployee(EmployeeInput emp)
+        public async Task<Response<EmployeeResponse>> AddEmployee(EmployeeInput input)
         {
             var response = new Response<EmployeeResponse>();
             try
             {
 
-                var resp = await ValidateEmployee(_context, emp);
+                var resp = await ValidateEmployee(_context, input);
                 if (!resp.status)
                     return resp;
-             
-                
+
+
                 //Get The best code
-                var codes = await _context.Employees.Where(s => s.DeviceId == emp.deviceId).Select(x => x.Code).ToListAsync();
+                var codes = await _context.Employees.Where(s => s.DeviceId == input.deviceId).Select(x => x.Code).ToListAsync();
                 codes.Sort();
                 int newCode = 1;
                 foreach (var code in codes)
@@ -47,90 +47,125 @@ namespace HR_System_Backend.Repository.Repository
                     newCode++;
                 }
                 /////////////////////
-                
 
 
 
 
 
-                //Save The Employe To FingerPrint Device
-                var device = _context.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefault();
-                var fingerRepo = new FingerRepository(_context);
-                var saveUserResponse = fingerRepo.SetUserFinger(newCode, emp.name,emp.roleId.Value , new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, emp.password);
-                if (saveUserResponse.status == false)
+                if (input.addToDevice)
                 {
-                    response.status = false;
-                    response.message = saveUserResponse.message;
-                    return response;
+                    //Save The Employe To FingerPrint Device
+                    var device = _context.Devices.Where(x => x.DeviceId == input.deviceId).FirstOrDefault();
+                    var fingerRepo = new FingerRepository(_context);
+                    var saveUserResponse = fingerRepo.SetUserFinger(newCode, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
+                    if (saveUserResponse.status == false)
+                    {
+                        response.status = false;
+                        response.message = saveUserResponse.message;
+                        return response;
+                    }
+                    //////////////////////////////////////////
                 }
-                //////////////////////////////////////////
-                
+
+
 
 
 
 
                 Holiday holiday = null;
                 WorkDay workDays = null;
-                if (emp.holiday != null)
+                if (input.holiday != null)
                 {
                     holiday = new Holiday
                     {
-                        Saturday = emp.holiday.Saturday,
-                        Sunday = emp.holiday.Sunday,
-                        Monday = emp.holiday.Monday,
-                        Tuesday = emp.holiday.Tuesday,
-                        Wednesday = emp.holiday.Wednesday,
-                        Thursday = emp.holiday.Thursday,
-                        Friday = emp.holiday.Friday
+                        Saturday = input.holiday.Saturday,
+                        Sunday = input.holiday.Sunday,
+                        Monday = input.holiday.Monday,
+                        Tuesday = input.holiday.Tuesday,
+                        Wednesday = input.holiday.Wednesday,
+                        Thursday = input.holiday.Thursday,
+                        Friday = input.holiday.Friday
 
                     };
-                }
-                if (emp.workDays != null)
-                {
+
                     workDays = new WorkDay
                     {
-                        Saturday = emp.workDays.Saturday,
-                        Sunday = emp.workDays.Sunday,
-                        Monday = emp.workDays.Monday,
-                        Tuesday = emp.workDays.Tuesday,
-                        Wednesday = emp.workDays.Wednesday,
-                        Thursday = emp.workDays.Thursday,
-                        Friday = emp.workDays.Friday
+                        Saturday = !input.holiday.Saturday,
+                        Sunday = !input.holiday.Sunday,
+                        Monday = !input.holiday.Monday,
+                        Tuesday = !input.holiday.Tuesday,
+                        Wednesday = !input.holiday.Wednesday,
+                        Thursday = !input.holiday.Thursday,
+                        Friday = !input.holiday.Friday
 
                     };
                 }
+                //if (input.workDays != null)
+                //{
+                //    workDays = new WorkDay
+                //    {
+                //        Saturday = input.workDays.Saturday,
+                //        Sunday = input.workDays.Sunday,
+                //        Monday = input.workDays.Monday,
+                //        Tuesday = input.workDays.Tuesday,
+                //        Wednesday = input.workDays.Wednesday,
+                //        Thursday = input.workDays.Thursday,
+                //        Friday = input.workDays.Friday
+
+                //    };
+                //}
                 var employee = new Employee
                 {
-                    Name = emp.name,
-                    Address = emp.address,
-                    Email = emp.email,
-                    CreateDate = emp.createdDate,
-                    Mobile = emp.mobile,
-                    Phone = emp.phone,
-                    Salary = emp.salary,
-                    TimeIn = TimeSpan.Parse(emp.timeIn),
-                    TimeOut = TimeSpan.Parse(emp.timeOut),
-                    AllowCome = emp.allowCome,
-                    AllowOut = emp.allowOut,
-                    BaseTime = emp.baseTime,
-                    DepartmentId = emp.departmentId,
-                    CategoryId = emp.categoryId,
-                    SalaryTypeId = emp.salaryId,
-                    ShiftId = emp.shiftId,
+                    Name = input.name,
+                    Address = input.address,
+                    Email = input.email,
+                    CreateDate = input.createdDate,
+                    Mobile = input.mobile,
+                    Phone = input.phone,
+                    Salary = input.salary,
+                    TimeIn = TimeSpan.Parse(input.timeIn),
+                    TimeOut = TimeSpan.Parse(input.timeOut),
+                    AllowCome = input.allowCome,
+                    AllowOut = input.allowOut,
+                    BaseTime = input.baseTime,
+                    DepartmentId = input.departmentId,
+                    CategoryId = input.categoryId,
+                    SalaryTypeId = input.salaryId,
+                    ShiftId = input.shiftId,
                     Holiday = holiday,
                     WorkDay = workDays,
                     Code = newCode,
-                    DeviceId = emp.deviceId,
-                    RoleId = emp.roleId
+                    DeviceId = input.deviceId,
+                    RoleId = input.roleId,
+                    Productivity = input.productivity
+
                 };
+                // Check if employe poductivity
+                if (input.productivity == true)
+                {
+                    if (input.items != null)
+                    {
+                        foreach (var item in input.items)
+                        {
+                            employee.Items.Add(new Item
+                            {
+                                ItemName = item.ItemName,
+                                ItemPrice = item.ItemPrice,
+                                ItemCommission = item.ItemCommission,
+                                ItemQnty = item.ItemQnty
+                            });
+                        }
+                    }
+                }
+                //////////////////////////////////////////
 
                 await _context.Employees.AddAsync(employee);
                 await _context.SaveChangesAsync();
-                if (emp.documents != null)
+                if (input.documents != null)
                 {
-                    if (emp.documents.Count > 0)
+                    if (input.documents.Count > 0)
                     {
-                        var paths = SaveDocuments(emp.documents, employee.Id);
+                        var paths = SaveDocuments(input.documents, employee.Id);
                         foreach (var path in paths)
                         {
                             employee.Documents.Add(new Document
@@ -150,26 +185,23 @@ namespace HR_System_Backend.Repository.Repository
                 var employeeResponse = new EmployeeResponse
                 {
                     id = employee.Id,
-                    name = emp.name,
-                    address = emp.address,
-                    email = emp.email,
-                    createdDate = emp.createdDate,
-                    mobile = emp.mobile,
-                    phone = emp.phone,
-                    salary = emp.salary,
-                    timeIn = emp.timeIn,
-                    timeOut = emp.timeOut,
-                    allowCome = emp.allowCome,
-                    allowOut = emp.allowOut,
-                    baseTime = emp.baseTime,
-                    departmentId = emp.departmentId,
-                    categoryId = emp.categoryId,
-                    salaryId = emp.salaryId,
-                    shiftId = emp.shiftId,
-                    holiday = emp.holiday,
-                    workDays = emp.workDays
-
-
+                    name = input.name,
+                    address = input.address,
+                    email = input.email,
+                    createdDate = input.createdDate,
+                    mobile = input.mobile,
+                    phone = input.phone,
+                    salary = input.salary,
+                    timeIn = input.timeIn,
+                    timeOut = input.timeOut,
+                    allowCome = input.allowCome,
+                    allowOut = input.allowOut,
+                    baseTime = input.baseTime,
+                    departmentId = input.departmentId,
+                    categoryId = input.categoryId,
+                    salaryId = input.salaryId,
+                    shiftId = input.shiftId,
+                    holiday = input.holiday
                 };
                 response.status = true;
                 response.message = "تمت اضافة الموظف بنجاح";
@@ -239,7 +271,12 @@ namespace HR_System_Backend.Repository.Repository
             try
             {
 
-                var employee = _context.Employees.Include(s => s.Holiday).Include(s => s.WorkDay).Where(x => x.Id == emp.id).FirstOrDefault();
+                var employee = _context.Employees.Include(s => s.Holiday)
+                                                 .Include(s => s.WorkDay)
+                                                 .Include(s => s.Items)
+                                                 .Include(s => s.Documents)
+                                                 .Where(x => x.Id == emp.id)
+                                                 .FirstOrDefault();
                 if (employee == null)
                 {
                     response.status = false;
@@ -254,6 +291,10 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     return resp;
                 }
+
+
+
+
                 if (employee.Holiday == null)
                 {
                     employee.Holiday = new Holiday();
@@ -299,7 +340,59 @@ namespace HR_System_Backend.Repository.Repository
                 employee.ShiftId = emp.shiftId;
 
 
+                
+                if (emp.productivity == true)
+                {
+                    
+                    if (emp.items != null)
+                    {
+                        foreach (var item in emp.items)
+                        {
+                            employee.Items.Add(new Item
+                            {
+                                ItemName = item.ItemName,
+                                ItemPrice = item.ItemPrice,
+                                ItemCommission = item.ItemCommission,
+                                ItemQnty = item.ItemQnty
+                            });
+                        }
+                    }
+                }
+               
+
+
+
                 await _context.SaveChangesAsync();
+                //Delete employee doucuments folder
+                var exist = Directory.Exists("documents/" + emp.id.ToString());
+                if (exist)
+                {
+                    Directory.Delete("documents/" + emp.id.ToString(), true);
+                }
+                ////////////////////////////////////
+                
+
+
+
+                if (emp.documents != null)
+                {
+                    if (emp.documents.Count > 0)
+                    {
+                        var paths = SaveDocuments(emp.documents, employee.Id);
+                        foreach (var path in paths)
+                        {
+                            employee.Documents.Add(new Document
+                            {
+                                DocumentPath = path,
+                                DocumentName = "FileName",
+                                UploadDate = DateTime.Now,
+                                AddedBy = "User"
+                            });
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+
+                }
 
                 response.status = true;
                 response.message = "تم تعديل الموظف بنجاح";
@@ -483,9 +576,6 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-
-
-
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -493,35 +583,48 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if  finger Device is existing
             ///////////////////////////////////////////////////////////////////////////
-            var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
-            if (device == null)
+            ///
+            if (emp.addToDevice)
             {
-                response.status = false;
-                response.message = "جهاز البصمة غير موجود";
-                return response;
+                var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
+                if (device == null)
+                {
+                    response.status = false;
+                    response.message = "جهاز البصمة غير موجود";
+                    return response;
+                }
             }
+
 
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
             ///////////////////////////////////////////////////////////////////////////
-            var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
-            if (dept == null)
+            if (emp.departmentId != null)
             {
-                response.status = false;
-                response.message = "القسم غير موجود";
-                return response;
+                var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
+                if (dept == null)
+                {
+                    response.status = false;
+                    response.message = "القسم غير موجود";
+                    return response;
+                }
             }
+
 
 
             ///////////////////////////////////////////////////////////////////////////
             //check if category is existing
             ///////////////////////////////////////////////////////////////////////////
-            var cat = await db.Categories.Where(x => x.CategoryId == emp.categoryId).FirstOrDefaultAsync();
-            if (cat == null)
+            if (emp.categoryId != null)
             {
-                response.status = false;
-                response.message = "نوع الوظيفه غير موجود";
-                return response;
+                var cat = await db.Categories.Where(x => x.CategoryId == emp.categoryId).FirstOrDefaultAsync();
+                if (cat == null)
+                {
+                    response.status = false;
+                    response.message = "نوع الوظيفه غير موجود";
+                    return response;
+                }
+
             }
 
 
@@ -529,27 +632,34 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if salary type is existing
             ///////////////////////////////////////////////////////////////////////////
-            ///
-            var salaryType = await db.SalaryTypes.Where(x => x.SalaryTypeId == emp.salaryId).FirstOrDefaultAsync();
-            if (salaryType == null)
+            if (emp.salaryId != null)
             {
-                response.status = false;
-                response.message = "نوع الراتب غير موجود";
-                return response;
+                var salaryType = await db.SalaryTypes.Where(x => x.SalaryTypeId == emp.salaryId).FirstOrDefaultAsync();
+                if (salaryType == null)
+                {
+                    response.status = false;
+                    response.message = "نوع الراتب غير موجود";
+                    return response;
+                }
             }
+
 
 
 
             ///////////////////////////////////////////////////////////////////////////
             //check if shift is existing
             ///////////////////////////////////////////////////////////////////////////
-            var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();
-            if (shift == null)
+            if (emp.shiftId != null)
             {
-                response.status = false;
-                response.message = "الوردية غير  موجوده";
-                return response;
+                var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();
+                if (shift == null)
+                {
+                    response.status = false;
+                    response.message = "الوردية غير  موجوده";
+                    return response;
+                }
             }
+
 
 
 
@@ -566,31 +676,35 @@ namespace HR_System_Backend.Repository.Repository
         {
             var response = new Response<EmployeeResponse>();
 
-
-
-
-
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
             ///////////////////////////////////////////////////////////////////////////
-            var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
-            if (dept == null)
+            if (emp.departmentId != null)
             {
-                response.status = false;
-                response.message = "القسم غير موجود";
-                return response;
+                var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
+                if (dept == null)
+                {
+                    response.status = false;
+                    response.message = "القسم غير موجود";
+                    return response;
+                }
             }
+
 
 
             ///////////////////////////////////////////////////////////////////////////
             //check if category is existing
             ///////////////////////////////////////////////////////////////////////////
-            var cat = await db.Categories.Where(x => x.CategoryId == emp.categoryId).FirstOrDefaultAsync();
-            if (cat == null)
+            if (emp.categoryId != null)
             {
-                response.status = false;
-                response.message = "نوع الوظيفه غير موجود";
-                return response;
+                var cat = await db.Categories.Where(x => x.CategoryId == emp.categoryId).FirstOrDefaultAsync();
+                if (cat == null)
+                {
+                    response.status = false;
+                    response.message = "نوع الوظيفه غير موجود";
+                    return response;
+                }
+
             }
 
 
@@ -598,27 +712,35 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if salary type is existing
             ///////////////////////////////////////////////////////////////////////////
-            ///
-            var salaryType = await db.SalaryTypes.Where(x => x.SalaryTypeId == emp.salaryId).FirstOrDefaultAsync();
-            if (salaryType == null)
+            if (emp.salaryId != null)
             {
-                response.status = false;
-                response.message = "نوع الراتب غير موجود";
-                return response;
+                var salaryType = await db.SalaryTypes.Where(x => x.SalaryTypeId == emp.salaryId).FirstOrDefaultAsync();
+                if (salaryType == null)
+                {
+                    response.status = false;
+                    response.message = "نوع الراتب غير موجود";
+                    return response;
+                }
             }
+
 
 
 
             ///////////////////////////////////////////////////////////////////////////
             //check if shift is existing
             ///////////////////////////////////////////////////////////////////////////
-            var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();
-            if (shift == null)
+            if (emp.shiftId != null)
             {
-                response.status = false;
-                response.message = "الوردية غير  موجوده";
-                return response;
+                var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();
+                if (shift == null)
+                {
+                    response.status = false;
+                    response.message = "الوردية غير  موجوده";
+                    return response;
+                }
             }
+
+
             response.status = true;
             return response;
 
@@ -667,6 +789,9 @@ namespace HR_System_Backend.Repository.Repository
             }
             return paths;
         }
+
+
+
 
     }
 }

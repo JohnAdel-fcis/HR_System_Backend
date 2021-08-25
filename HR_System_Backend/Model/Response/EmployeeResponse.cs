@@ -1,4 +1,5 @@
 ﻿using HR_System_Backend.Model.Helper;
+using HR_System_Backend.Model.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,5 +28,11 @@ namespace HR_System_Backend.Model.Response
         public int? shiftId { get; set; }
         public Week holiday { get; set; }
         public Week workDays { get; set; }
+        public List<string> documents { get; set; }
+        public int? roleId { get; set; }
+        public int? deviceId { get; set; }
+        public string password { get; set; }
+        public bool productivity { get; set; }
+        public List<ItemInput> items { get; set; }
     }
 }
