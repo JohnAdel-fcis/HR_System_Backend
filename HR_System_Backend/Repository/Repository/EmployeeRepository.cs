@@ -629,7 +629,6 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
-
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
         {
             var response = new Response<EmployeeResponse>();
