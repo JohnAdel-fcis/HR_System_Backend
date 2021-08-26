@@ -73,7 +73,37 @@ namespace HR_System_Backend.Controllers
                 return NotFound(response);
             }
         }
-        
+
+        [HttpGet]
+        [Route("GetRoles")]
+        public async Task<IActionResult> GetRoles()
+        {
+
+            var response = new Response<RoleResponse>();
+            try
+            {
+
+                var result = await Irepo.GetRoles();
+                if (result.status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return NotFound(result);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return NotFound(response);
+            }
+
+        }
+
+
         [HttpGet]
         [Route("Get/{id}")]
         public async Task<IActionResult> Get(int id)
@@ -145,5 +175,13 @@ namespace HR_System_Backend.Controllers
                 return NotFound(result);
             }
         }
+    
+            
+    
+    
+    
+    
+    
+    
     }
 }

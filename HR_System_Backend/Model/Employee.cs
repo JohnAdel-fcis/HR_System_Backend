@@ -40,6 +40,7 @@ namespace HR_System_Backend.Model
         public bool? Productivity { get; set; }
         public int? RoleId { get; set; }
         public int? DeviceId { get; set; }
+        public string Password { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual Department Department { get; set; }

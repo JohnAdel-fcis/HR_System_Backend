@@ -33,6 +33,6 @@ namespace HR_System_Backend.Model.Response
         public int? deviceId { get; set; }
         public string password { get; set; }
         public bool productivity { get; set; }
-        public List<ItemInput> items { get; set; }
+        public List<ItemResponse> items { get; set; }
     }
 }

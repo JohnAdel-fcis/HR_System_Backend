@@ -3,6 +3,7 @@ using HR_System_Backend.Model.Helper;
 using HR_System_Backend.Model.Input;
 using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
+using ImageMagick;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -137,7 +138,8 @@ namespace HR_System_Backend.Repository.Repository
                     Code = newCode,
                     DeviceId = input.deviceId,
                     RoleId = input.roleId,
-                    Productivity = input.productivity
+                    Productivity = input.productivity,
+                    Password = input.password
 
                 };
                 // Check if employe poductivity
@@ -338,9 +340,10 @@ namespace HR_System_Backend.Repository.Repository
                 employee.CategoryId = emp.categoryId;
                 employee.SalaryTypeId = emp.salaryId;
                 employee.ShiftId = emp.shiftId;
+                employee.Password = emp.password;
+                employee.Productivity = emp.productivity;
+                employee.RoleId = emp.roleId;
 
-
-                
                 if (emp.productivity == true)
                 {
                     
@@ -348,17 +351,25 @@ namespace HR_System_Backend.Repository.Repository
                     {
                         foreach (var item in emp.items)
                         {
-                            employee.Items.Add(new Item
+                            var itm = employee.Items.Where(x => x.ItemId == item.ItemId).FirstOrDefault();
+                            if (itm == null)
                             {
-                                ItemName = item.ItemName,
-                                ItemPrice = item.ItemPrice,
-                                ItemCommission = item.ItemCommission,
-                                ItemQnty = item.ItemQnty
-                            });
+                                employee.Items.Add(new Item
+                                {
+                                    ItemName = item.ItemName,
+                                    ItemPrice = item.ItemPrice,
+                                    ItemCommission = item.ItemCommission,
+                                    ItemQnty = item.ItemQnty
+                                });
+                            }
+                            itm.ItemName = item.ItemName;
+                            itm.ItemPrice = item.ItemPrice;
+                            itm.ItemCommission = item.ItemCommission;
+
                         }
                     }
                 }
-               
+
 
 
 
@@ -370,8 +381,6 @@ namespace HR_System_Backend.Repository.Repository
                     Directory.Delete("documents/" + emp.id.ToString(), true);
                 }
                 ////////////////////////////////////
-                
-
 
 
                 if (emp.documents != null)
@@ -512,58 +521,77 @@ namespace HR_System_Backend.Repository.Repository
             try
             {
 
-                var emplyees = await _context.Employees.Include(x => x.Holiday).Include(x => x.WorkDay).Where(e => e.Id == id).Select(x => new EmployeeResponse
-                {
-                    id = x.Id,
-                    name = x.Name,
-                    address = x.Address,
-                    email = x.Email,
-                    phone = x.Phone,
-                    mobile = x.Mobile,
-                    salary = x.Salary,
-                    salaryId = x.SalaryTypeId,
-                    categoryId = x.CategoryId,
-                    shiftId = x.ShiftId,
-                    allowCome = x.AllowCome,
-                    allowOut = x.AllowOut,
-                    timeIn = x.TimeIn.Value.ToString(@"hh\:mm"),
-                    timeOut = x.TimeOut.Value.ToString(@"hh\:mm"),
-                    baseTime = x.BaseTime,
-                    createdDate = x.CreateDate,
-                    departmentId = x.DepartmentId,
-                    holiday = new Week
-                    {
-                        Saturday = x.Holiday.Saturday,
-                        Sunday = x.Holiday.Sunday,
-                        Monday = x.Holiday.Monday,
-                        Tuesday = x.Holiday.Tuesday,
-                        Wednesday = x.Holiday.Wednesday,
-                        Thursday = x.Holiday.Thursday,
-                        Friday = x.Holiday.Friday
-                    },
-                    workDays = new Week
-                    {
-                        Saturday = x.WorkDay.Saturday,
-                        Sunday = x.WorkDay.Sunday,
-                        Monday = x.WorkDay.Monday,
-                        Tuesday = x.WorkDay.Tuesday,
-                        Wednesday = x.WorkDay.Wednesday,
-                        Thursday = x.WorkDay.Thursday,
-                        Friday = x.WorkDay.Friday
-                    },
+                var emplyee = await _context.Employees
+                                        .Include(x => x.Holiday)
+                                        .Include(x => x.WorkDay)
+                                        .Include(x => x.Items)
+                                        .Include(x => x.Documents)
+                                        .Where(e => e.Id == id)
+                                        .Select(x => new EmployeeResponse
+                                        {
+                                            id = x.Id,
+                                            name = x.Name,
+                                            address = x.Address,
+                                            email = x.Email,
+                                            phone = x.Phone,
+                                            mobile = x.Mobile,
+                                            salary = x.Salary,
+                                            salaryId = x.SalaryTypeId,
+                                            categoryId = x.CategoryId,
+                                            shiftId = x.ShiftId,
+                                            allowCome = x.AllowCome,
+                                            allowOut = x.AllowOut,
+                                            timeIn = x.TimeIn.Value.ToString(@"hh\:mm"),
+                                            timeOut = x.TimeOut.Value.ToString(@"hh\:mm"),
+                                            baseTime = x.BaseTime,
+                                            createdDate = x.CreateDate,
+                                            departmentId = x.DepartmentId,
+                                            holiday = new Week
+                                            {
+                                                Saturday = x.Holiday.Saturday,
+                                                Sunday = x.Holiday.Sunday,
+                                                Monday = x.Holiday.Monday,
+                                                Tuesday = x.Holiday.Tuesday,
+                                                Wednesday = x.Holiday.Wednesday,
+                                                Thursday = x.Holiday.Thursday,
+                                                Friday = x.Holiday.Friday
+                                            },
+                                            workDays = new Week
+                                            {
+                                                Saturday = x.WorkDay.Saturday,
+                                                Sunday = x.WorkDay.Sunday,
+                                                Monday = x.WorkDay.Monday,
+                                                Tuesday = x.WorkDay.Tuesday,
+                                                Wednesday = x.WorkDay.Wednesday,
+                                                Thursday = x.WorkDay.Thursday,
+                                                Friday = x.WorkDay.Friday
+                                            },
+                                            deviceId = x.DeviceId,
+                                            items = x.Items.Select(x => new ItemResponse { ItemId = x.ItemId, ItemName = x.ItemName, ItemPrice = x.ItemPrice, ItemCommission = x.ItemCommission }).ToList(),
+                                            roleId = x.RoleId,
+                                            password = x.Password,
+                                            productivity = x.Productivity.Value
+                                        }).FirstOrDefaultAsync();
 
+                
 
-                }).ToListAsync();
-
-                if (emplyees.Count == 0)
+                if (emplyee == null)
                 {
                     response.status = true;
                     response.message = "لا يوجد بيانات";
                     return response;
                 }
+
+                var documentsPaths = await _context.Employees.Include(x => x.Documents).Where(e => e.Id == id).Select(x => x.Documents.Select(s => s.DocumentPath)).FirstOrDefaultAsync();
+                var paths = documentsPaths.ToList();
+                var imagesBase64 = ReadDocuments(paths);
+                emplyee.documents = imagesBase64;
+
+
+
                 response.status = true;
                 response.message = "تم سحب البيانات بنجاح";
-                response.data = emplyees;
+                response.data.Add(emplyee);
                 return response;
 
             }
@@ -574,6 +602,32 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
 
+        }
+
+        public async Task<Response<RoleResponse>> GetRoles()
+        {
+            var response = new Response<RoleResponse>();
+            try
+            {
+                var roles = await _context.Roles.Select(x => new RoleResponse { RoleId = x.RoleId, RoleName = x.RoleName }).ToListAsync();
+                if (roles.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد بيانات";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = roles;
+                return response;
+
+            }
+            catch (Exception)
+            {
+                response.status = false;
+                response.message = "حدث خطأ";
+                return response;
+            }
         }
 
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
@@ -669,8 +723,6 @@ namespace HR_System_Backend.Repository.Repository
             return response;
 
         }
-
-
 
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeResponse emp)
         {
@@ -790,7 +842,17 @@ namespace HR_System_Backend.Repository.Repository
             return paths;
         }
 
-
+        private List<string> ReadDocuments(List<string> paths)
+        {
+            var images = new List<string>();
+            foreach (var path in paths)
+            {
+                byte[] imageArray = System.IO.File.ReadAllBytes(path);
+                var image = Convert.ToBase64String(imageArray);
+                images.Add(image);
+            }
+            return images;
+        }
 
 
     }

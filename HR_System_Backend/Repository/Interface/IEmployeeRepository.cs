@@ -16,7 +16,7 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<Employee>> GetAllDetailsEmployes();
         Task<Response<EmployeeResponse>> GetEmployee(int id);
         Task<Response<EmployeeResponse>> DeleteEmployee(int id);
-       
+        Task<Response<RoleResponse>> GetRoles();
 
     }
 }

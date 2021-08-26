@@ -331,6 +331,10 @@ namespace HR_System_Backend.Model
                     .HasMaxLength(100)
                     .HasColumnName("NAME");
 
+                entity.Property(e => e.Password)
+                    .HasMaxLength(30)
+                    .HasColumnName("PASSWORD");
+
                 entity.Property(e => e.Phone)
                     .HasMaxLength(20)
                     .HasColumnName("PHONE");
