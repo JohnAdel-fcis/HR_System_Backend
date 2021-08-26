@@ -18,6 +18,7 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<GetUserInfoResponse>> GetUsersInfoFromDevice(FingerGetAllInput input);
         Response<bool> DeleteUserFinger(int machineNum, string code, Device input);
         Task<Response<DeviceResponse>> AddDevice(DeviceInput input);
+        Task<Response<DeviceResponse>> GetDeviceByid(int id);
 
     }
 }

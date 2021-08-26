@@ -118,7 +118,7 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-        public Response<bool> SetUserFinger(int userId, string name, int role , FingerGetAllInput input, string password = "")
+        public Response<bool> SetUserFinger(int userId, string name, int role, FingerGetAllInput input, string password = "")
         {
             var response = new Response<bool>();
             var device = new CZKEM();
@@ -148,14 +148,14 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-        public Response<bool> DeleteUserFinger(int machineNum, string code , Device input)
+        public Response<bool> DeleteUserFinger(int machineNum, string code, Device input)
         {
             var response = new Response<bool>();
             var device = new CZKEM();
             var connected = device.Connect_Net(input.DeviceIp, Convert.ToInt32(input.DevicePort));
             if (connected)
             {
-                var added = device.SSR_DeleteEnrollData( machineNum , code , 12 );
+                var added = device.SSR_DeleteEnrollData(machineNum, code, 12);
                 if (added)
                 {
                     response.status = true;
@@ -239,7 +239,7 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
-    
+
 
 
 
@@ -342,7 +342,7 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-        private Response<GetUserInfoResponse> GetUsersInfo(FingerGetAllInput input )
+        private Response<GetUserInfoResponse> GetUsersInfo(FingerGetAllInput input)
         {
             var response = new Response<GetUserInfoResponse>();
             var axCZKEM1 = new zkemkeeper.CZKEM();
@@ -420,7 +420,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort,Priority=x.Priority }).ToListAsync();
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority }).ToListAsync();
                 if (devices.Count == 0)
                 {
                     response.status = false;
@@ -469,6 +469,32 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "حدث خطأ";
                 return response;
             }
+        }
+
+        public async Task<Response<DeviceResponse>> GetDeviceByid(int id)
+        {
+            var response = new Response<DeviceResponse>();
+            try
+            {
+                var device = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority }).Where(x => x.DeviceId == id).FirstOrDefaultAsync();
+                if (device == null)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد اجهزه";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data.Add(device);
+                return response;
+            }
+            catch (Exception)
+            {
+                response.status = false;
+                response.message = "حدث خطأ";
+                return response;
+            }
+
         }
     }
 }

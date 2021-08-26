@@ -52,6 +52,34 @@ namespace HR_System_Backend.Controllers
 
         }
 
+
+        [HttpGet]
+        [Route("GetDevice/{id}")]
+        public async Task<IActionResult> GetDevice(int id)
+        {
+            try
+            {
+                var response = await Irepo.GetDeviceByid(id);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+
+
         [HttpPost]
         [Route("GetAllLogs")]
         public async  Task<IActionResult> GetAllLogs(FingerGetAllInput input )
