@@ -3,7 +3,7 @@ using HR_System_Backend.Model.Helper;
 using HR_System_Backend.Model.Input;
 using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
-using ImageMagick;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
