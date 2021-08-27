@@ -10,5 +10,6 @@ namespace HR_System_Backend.Model.Helper
         public int? idwInOutMode { get; set; }
         public DateTime LogDate { get; set; }
         public TimeSpan LogTime { get; set; }
+        public int? deviceId { get; set; }
     }
 }

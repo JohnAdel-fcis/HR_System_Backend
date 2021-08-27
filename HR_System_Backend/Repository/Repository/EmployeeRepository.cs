@@ -29,6 +29,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
+                
 
                 var resp = await ValidateEmployee(_context, input);
                 if (!resp.status)
@@ -68,7 +69,10 @@ namespace HR_System_Backend.Repository.Repository
                     //////////////////////////////////////////
                 }
 
-
+                if (input.salaryId == 0)
+                {
+                    input.salaryId = null;
+                }
 
 
 
@@ -225,7 +229,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Where(x => x.Id == id).FirstOrDefaultAsync();
+                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Include(x=>x.Device).Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (emp == null)
                 {
                     response.status = false;

@@ -163,7 +163,7 @@ namespace HR_System_Backend.Controllers
 
         [HttpDelete]
         [Route("Delete/{id}")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var result = await Irepo.DeleteEmployee(id);
             if (result.status)

@@ -12,5 +12,6 @@ namespace HR_System_Backend.Model.Response
         public string password { get; set; }
         public int privilage { get; set; }
         public bool enabled { get; set; }
+        public int deviceId { get; set; }
     }
 }

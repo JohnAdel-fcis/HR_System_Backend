@@ -50,7 +50,7 @@ namespace HR_System_Backend.Repository.Repository
                 var Old = new EmpInfoFinger();
                 foreach (var item in data)
                 {
-                    var emp = _context.Employees.Where(x => x.Code == item.idwEnrollNumber).FirstOrDefault();
+                    var emp = _context.Employees.Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
                     if (emp == null)
                     {
                         CodeNoEmp.Add(item.idwEnrollNumber);
@@ -214,13 +214,16 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 foreach (var item in input)
                 {
-                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id)).FirstOrDefault();
+                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id) && x.DeviceId == item.deviceId).FirstOrDefault();
                     if (exist == null)
                     {
                         var emp = new Employee
                         {
                             Name = item.name,
-                            Code = Int32.Parse(item.id)
+                            Code = Int32.Parse(item.id),
+                            DeviceId =item.deviceId,
+                            Password =item.password,
+                            RoleId = item.privilage
                         };
                         _context.Employees.Add(emp);
                     }
