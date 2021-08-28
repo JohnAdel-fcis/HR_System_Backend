@@ -29,7 +29,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                
+
 
                 var resp = await ValidateEmployee(_context, input);
                 if (!resp.status)
@@ -229,7 +229,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Include(x=>x.Device).Where(x => x.Id == id).FirstOrDefaultAsync();
+                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Include(x => x.Device).Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (emp == null)
                 {
                     response.status = false;
@@ -290,6 +290,10 @@ namespace HR_System_Backend.Repository.Repository
                     return response;
                 }
 
+                if (emp.salaryId == 0)
+                {
+                    emp.salaryId = null;
+                }
 
 
                 var resp = await ValidateEmployee(_context, emp);
@@ -350,7 +354,7 @@ namespace HR_System_Backend.Repository.Repository
 
                 if (emp.productivity == true)
                 {
-                    
+
                     if (emp.items != null)
                     {
                         foreach (var item in emp.items)
@@ -366,9 +370,12 @@ namespace HR_System_Backend.Repository.Repository
                                     ItemQnty = item.ItemQnty
                                 });
                             }
+                            else
+                            { 
                             itm.ItemName = item.ItemName;
                             itm.ItemPrice = item.ItemPrice;
                             itm.ItemCommission = item.ItemCommission;
+                            }
 
                         }
                     }
@@ -384,6 +391,9 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     Directory.Delete("documents/" + emp.id.ToString(), true);
                 }
+                var doc = _context.Documents.Where(x => x.EmployeeId == emp.id).ToList();
+                _context.Documents.RemoveRange(doc);
+                await _context.SaveChangesAsync();
                 ////////////////////////////////////
 
 
@@ -577,7 +587,7 @@ namespace HR_System_Backend.Repository.Repository
                                             productivity = x.Productivity.Value
                                         }).FirstOrDefaultAsync();
 
-                
+
 
                 if (emplyee == null)
                 {

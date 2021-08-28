@@ -89,7 +89,7 @@ namespace HR_System_Backend
             services.AddTransient<IShiftRepository, ShiftRepository>();
             services.AddTransient<IDebitRepository, DebitRepository>();
             services.AddTransient<IFingerRepository, FingerRepository>();
-
+            services.AddTransient<IProductiviyRepository, ProductiviyRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
