@@ -42,7 +42,7 @@ namespace HR_System_Backend.Model
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-0B4I9QK\\SQLEXPRESS;Database=HR_DB;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=PHS-IT53\\;Database=HR_DB;Trusted_Connection=True;");
             }
         }
 
@@ -251,6 +251,11 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.DeviceIp)
                     .HasMaxLength(30)
                     .HasColumnName("DEVICE_IP");
+
+                entity.Property(e => e.DeviceName)
+                    .HasMaxLength(200)
+                    .HasColumnName("DEVICE_NAME")
+                    .HasDefaultValueSql("('NAME')");
 
                 entity.Property(e => e.DevicePort)
                     .HasMaxLength(10)
@@ -572,6 +577,14 @@ namespace HR_System_Backend.Model
                 entity.ToTable("SHIFT");
 
                 entity.Property(e => e.ShiftId).HasColumnName("SHIFT_ID");
+
+                entity.Property(e => e.AllowCome)
+                    .HasColumnName("ALLOW_COME")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AllowLeave)
+                    .HasColumnName("ALLOW_LEAVE")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.DateFrom)
                     .HasColumnType("date")

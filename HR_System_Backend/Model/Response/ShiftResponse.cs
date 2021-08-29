@@ -13,5 +13,7 @@ namespace HR_System_Backend.Model.Response
         public DateTime? dateTo { get; set; }
         public string timeFrom { get; set; }
         public string timeTo { get; set; }
+         public int? allowCome { get; set; }
+        public int? allowLeave { get; set; }
     }
 }

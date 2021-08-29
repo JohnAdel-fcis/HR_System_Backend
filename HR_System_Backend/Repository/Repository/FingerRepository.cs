@@ -221,8 +221,8 @@ namespace HR_System_Backend.Repository.Repository
                         {
                             Name = item.name,
                             Code = Int32.Parse(item.id),
-                            DeviceId =item.deviceId,
-                            Password =item.password,
+                            DeviceId = item.deviceId,
+                            Password = item.password,
                             RoleId = item.privilage
                         };
                         _context.Employees.Add(emp);
@@ -438,10 +438,10 @@ namespace HR_System_Backend.Repository.Repository
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 response.status = false;
-                response.message = "حدث خطأ";
+                response.message = ex.Message;
                 return response;
             }
         }
@@ -458,12 +458,12 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "هذا الجهاز موجود";
                     return response;
                 }
-                var newDevice = new Device { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority };
+                var newDevice = new Device { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceName = input.deviceName };
                 await _context.Devices.AddAsync(newDevice);
                 await _context.SaveChangesAsync();
                 response.status = true;
                 response.message = "تمت اضافة الجهاز بنجاح";
-                response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId });
+                response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId, deviceName = newDevice.DeviceName });
                 return response;
             }
             catch (Exception)
@@ -472,6 +472,40 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "حدث خطأ";
                 return response;
             }
+        }
+
+        public async Task<Response<DeviceResponse>> EditDevice(DeviceResponse input)
+        {
+            var respone = new Response<DeviceResponse>();
+            try
+            {
+                var selectedDevice = await _context.Devices.Where(x => x.DeviceId == input.DeviceId).FirstOrDefaultAsync();
+                if (selectedDevice == null)
+                {
+                    respone.status = false;
+                    respone.message = "الجهاز غير موجود";
+                    return respone;
+                }
+                selectedDevice.DeviceIp = input.DeviceIp;
+                selectedDevice.DevicePort = input.DevicePort;
+                selectedDevice.DeviceName = input.deviceName;
+                await _context.SaveChangesAsync();
+                respone.status = true;
+                respone.message = "تم تعديل الجهاز بنجاح";
+                respone.data.Add(input);
+                return respone;
+            }
+            catch (Exception ex)
+            {
+                respone.status = false;
+                respone.message = ex.Message;
+                return respone;
+            }
+
+
+
+
+
         }
 
         public async Task<Response<DeviceResponse>> GetDeviceByid(int id)

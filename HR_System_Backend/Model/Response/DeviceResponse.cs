@@ -11,5 +11,6 @@ namespace HR_System_Backend.Model.Response
         public string DeviceIp { get; set; }
         public string DevicePort { get; set; }
         public int? Priority { get; set; }
+        public string deviceName { get; set; }
     }
 }

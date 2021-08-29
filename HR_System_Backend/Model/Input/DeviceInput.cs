@@ -10,5 +10,6 @@ namespace HR_System_Backend.Model.Input
         public string deviceIP { get; set; }
         public string devicePort { get; set; }
         public int? priority { get; set; }
+        public string deviceName { get; set; }
     }
 }

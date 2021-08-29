@@ -31,37 +31,46 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "الموظف غير موجود او ليس في قسم الانتاجية";
                     return response;
                 }
-                var item = await _context.Items.Where(x => x.ItemId == input.ItemId).FirstOrDefaultAsync();
-                if (item == null)
+
+                foreach (var selectedTransaction in input.Transactions)
                 {
-                    response.status = false;
-                    response.message = "نوع القطعه غير موجود ";
-                    return response;
+                    if (selectedTransaction.Quantity == null || selectedTransaction.Quantity == 0)
+                    {
+                        continue;
+                    }
+                    var item = await _context.Items.Where(x => x.ItemId == selectedTransaction.ItemId).FirstOrDefaultAsync();
+                    if (item == null)
+                    {
+                        response.status = false;
+                        response.message = "نوع القطعه غير موجود ";
+                        return response;
+                    }
+
+                    var commisionPerUnit = item.ItemPrice / item.ItemQnty;
+
+
+                    var transaction = new ItemTransaction
+                    {
+                        ItemId = selectedTransaction.ItemId,
+                        ItemQuantity = selectedTransaction.Quantity,
+                        ItemComissions = (commisionPerUnit * selectedTransaction.Quantity),
+                        TransDate = selectedTransaction.Date
+                    };
+                    employee.ItemTransactions.Add(transaction);
+                    await _context.SaveChangesAsync();
+                    response.data.Add(new ItemTransactionResponse
+                    {
+                        EmpId = input.EmployeeId,
+                        ItemId = transaction.ItemId,
+                        TarnsId = transaction.TarnsId,
+                        ItemComissions = transaction.ItemComissions,
+                        ItemQuantity = transaction.ItemQuantity,
+                        TransDate = transaction.TransDate
+                    });
                 }
-
-                var commisionPerUnit = item.ItemPrice / item.ItemQnty;
-
-
-                var transaction = new ItemTransaction
-                {
-                    ItemId = input.ItemId,
-                    ItemQuantity = input.Quantity,
-                    ItemComissions = (commisionPerUnit * input.Quantity),
-                    TransDate = input.Date
-                };
-                employee.ItemTransactions.Add(transaction);
-                await _context.SaveChangesAsync();
                 response.status = true;
                 response.message = "تم اضافة العمليه بنجاح";
-                response.data.Add(new ItemTransactionResponse
-                {
-                    EmpId = input.EmployeeId,
-                    ItemId = input.ItemId,
-                    TarnsId = transaction.TarnsId,
-                    ItemComissions = transaction.ItemComissions,
-                    ItemQuantity = transaction.ItemQuantity,
-                    TransDate = transaction.TransDate
-                });
+
                 return response;
             }
             catch (Exception ex)
@@ -93,7 +102,7 @@ namespace HR_System_Backend.Repository.Repository
             try
             {
                 var transaction = await _context.ItemTransactions.Where(x => x.TarnsId == transactionId).FirstOrDefaultAsync();
-                if (transaction==null)
+                if (transaction == null)
                 {
                     response.status = false;
                     response.message = "العملية غير موجودة";
@@ -133,7 +142,27 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<ItemTransactionResponse>();
             try
             {
-                return null;
+                var transactions = await _context.ItemTransactions.Select(x => new ItemTransactionResponse
+                {
+                    EmpId = x.EmpId,
+                    ItemId = x.ItemId,
+                    ItemQuantity = x.ItemQuantity,
+                    ItemComissions = x.ItemComissions,
+                    TransDate = x.TransDate,
+                    TarnsId = x.TarnsId
+                }).Where(x => x.EmpId == empId).ToListAsync();
+                if (transactions.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد عمليات";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = transactions;
+                return response;
+
+
             }
             catch (Exception ex)
             {
@@ -148,7 +177,24 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<ItemResponse>();
             try
             {
-                return null;
+                var employee = await _context.Employees.Include(x => x.Items).Where(x => x.Id == empId).FirstOrDefaultAsync();
+                if (employee == null)
+                {
+                    response.status = false;
+                    response.message = "الموظف غير موجود ";
+                    return response;
+                }
+                var empItems = employee.Items.Select(x => new ItemResponse { ItemId = x.ItemId, ItemName = x.ItemName, ItemPrice = x.ItemPrice, ItemQnty = x.ItemQnty, ItemCommission = x.ItemQnty }).ToList();
+                if (empItems.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = empItems;
+                return response;
             }
             catch (Exception ex)
             {
@@ -163,7 +209,23 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                return null;
+                var productivityEmployees = await _context.Employees.Select(x => new EmployeeResponse
+                {
+                    id = x.Id,
+                    name = x.Name,
+
+                    productivity = x.Productivity.Value
+                }).Where(x => x.productivity == true).ToListAsync();
+                if (productivityEmployees.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد موظفين في قسم الانتاجيه";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = productivityEmployees;
+                return response;
             }
             catch (Exception ex)
             {
@@ -178,7 +240,31 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<ItemTransactionResponse>();
             try
             {
-                return null;
+                var transactions = await _context.ItemTransactions.Select(x => new ItemTransactionResponse
+                {
+                    EmpId = x.EmpId,
+                    ItemId = x.ItemId,
+                    ItemQuantity = x.ItemQuantity,
+                    ItemComissions = x.ItemComissions,
+                    TransDate = x.TransDate,
+                    TarnsId = x.TarnsId
+                }).Where(
+                    x => x.TransDate.Value.Second >= input.From.Value.Second &&
+                    x.TransDate.Value.Second <= input.To.Value.Second
+                    ).ToListAsync();
+
+                if (transactions.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد عمليات";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = transactions;
+                return response;
+
+
             }
             catch (Exception ex)
             {
@@ -186,6 +272,47 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = ex.Message;
                 return response;
             }
+        }
+
+        public async Task<Response<ItemTransactionResponse>> GetEmployeeTransactionsByDate(ProductivitySalaryInput input)
+        {
+            var response = new Response<ItemTransactionResponse>();
+            try
+            {
+                var transactions = await _context.ItemTransactions.Select(x => new ItemTransactionResponse
+                {
+                    EmpId = x.EmpId,
+                    ItemId = x.ItemId,
+                    ItemQuantity = x.ItemQuantity,
+                    ItemComissions = x.ItemComissions,
+                    TransDate = x.TransDate,
+                    TarnsId = x.TarnsId
+                }).Where(
+                    x => (x.EmpId == input.EmployeeId) && (x.TransDate.Value.Second >= input.From.Value.Second &&
+                    x.TransDate.Value.Second <= input.To.Value.Second)
+                    ).ToListAsync();
+
+                if (transactions.Count == 0)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد عمليات";
+                    return response;
+                }
+                response.status = true;
+                response.message = "تم سحب البيانات بنجاح";
+                response.data = transactions;
+                return response;
+
+
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+            //rabee3 &abibi
+
         }
     }
 }

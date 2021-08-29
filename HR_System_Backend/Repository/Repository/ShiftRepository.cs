@@ -20,12 +20,12 @@ namespace HR_System_Backend.Repository.Repository
         public async Task<Response<ShiftResponse>> AddShift(ShiftInput shift)
         {
             var response = new Response<ShiftResponse>();
-            if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
+           /*  if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
             {
                 response.status = false;
                 response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
                 return response;
-            }
+            } */
 
 
 
@@ -35,7 +35,9 @@ namespace HR_System_Backend.Repository.Repository
                 DateFrom = shift.dateFrom,
                 DateTo = shift.dateTo,
                 TimeFrom = TimeSpan.Parse(shift.timeFrom),
-                TimeTo = TimeSpan.Parse(shift.timeTo)
+                TimeTo = TimeSpan.Parse(shift.timeTo),
+                AllowCome=shift.allowCome,
+                AllowLeave=shift.allowLeave
             };
             try
             {
@@ -52,7 +54,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateFrom = shft.DateFrom,
                     dateTo = shft.DateTo,
                     timeFrom = shft.TimeFrom.ToString(),
-                    timeTo = shft.TimeTo.ToString()
+                    timeTo = shft.TimeTo.ToString(),
+                    allowCome=shift.allowCome ,
+                    allowLeave= shift.allowLeave 
                 });
 
                 return response;
@@ -108,12 +112,12 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "هذه الورديه غير موجودة";
                     return response;
                 }
-                if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
+                /* if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
                 {
                     response.status = false;
                     response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
                     return response;
-                }
+                } */
 
 
 
@@ -123,7 +127,9 @@ namespace HR_System_Backend.Repository.Repository
                     DateFrom = shift.dateFrom,
                     DateTo = shift.dateTo,
                     TimeFrom = TimeSpan.Parse(shift.timeFrom),
-                    TimeTo = TimeSpan.Parse(shift.timeTo)
+                    TimeTo = TimeSpan.Parse(shift.timeTo),
+                    AllowCome =shift.allowCome ,
+                    AllowLeave =shift.allowLeave
                 };
 
                 _context.Entry(shft).State = EntityState.Detached;
@@ -140,7 +146,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateFrom = shft.DateFrom,
                     dateTo = shft.DateTo,
                     timeFrom = shft.TimeFrom.ToString(),
-                    timeTo = shft.TimeTo.ToString()
+                    timeTo = shft.TimeTo.ToString(),
+                    allowCome =shift.allowCome ,
+                    allowLeave =shift.allowLeave
                 });
 
                 return response;
@@ -165,7 +173,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateFrom = x.DateFrom,
                     dateTo = x.DateTo,
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
-                    timeTo = x.TimeTo.Value.ToString(@"hh\:mm")
+                    timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
+                    allowCome =x.AllowCome,
+                    allowLeave=x.AllowLeave 
                 }).ToListAsync();
                 if (shifts.Count > 0)
                 {
@@ -200,7 +210,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateFrom = x.DateFrom,
                     dateTo = x.DateTo,
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
-                    timeTo = x.TimeTo.Value.ToString(@"hh\:mm")
+                    timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
+                    allowCome =x.AllowCome ,
+                    allowLeave=x.AllowLeave
                 }).FirstOrDefaultAsync();
                 if (shift != null)
                 {

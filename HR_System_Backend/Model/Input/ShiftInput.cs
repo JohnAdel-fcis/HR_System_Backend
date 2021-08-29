@@ -16,5 +16,7 @@ namespace HR_System_Backend.Model.Input
         public string timeFrom { get; set; }
         [Required]
         public string timeTo { get; set; }
+        public int? allowCome { get; set; }
+        public int? allowLeave { get; set; }
     }
 }

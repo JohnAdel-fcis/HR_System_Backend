@@ -112,7 +112,7 @@ namespace HR_System_Backend.Controllers
         {
             try
             {
-                var response =  Irepo.SetUserFinger(userId, name,1, input, password);
+                var response =   Irepo.SetUserFinger(userId, name,1, input, password);
                 if (response.status)
                 {
                     return Ok(response);
@@ -222,6 +222,32 @@ namespace HR_System_Backend.Controllers
             try
             {
                 var response = await Irepo.AddDevice(input);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+
+        [HttpPost]
+        [Route("EditDevice")]
+        public async Task<IActionResult> EditDevice(DeviceResponse input)
+        {
+            try
+            {
+                var response = await Irepo.EditDevice(input);
                 if (response.status)
                 {
                     return Ok(response);
