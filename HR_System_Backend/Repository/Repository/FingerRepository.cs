@@ -20,7 +20,11 @@ namespace HR_System_Backend.Repository.Repository
         {
             _context = context;
         }
-
+        enum InOutMode
+        {
+            In,    // 0
+            Out  // 1
+        }
 
         public async Task<Response<EmpInfoFinger>> GetLogsFromDevice(FingerGetAllInput input)
         {
@@ -50,12 +54,31 @@ namespace HR_System_Backend.Repository.Repository
                 var Old = new EmpInfoFinger();
                 foreach (var item in data)
                 {
-                    var emp = _context.Employees.Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
+                    var emp = _context.Employees.Include(x => x.Shift).Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
                     if (emp == null)
                     {
                         CodeNoEmp.Add(item.idwEnrollNumber);
                         continue;
                     }
+                    if (emp.Shift != null)
+                    {
+                        var Shift = emp.Shift;
+                        var InOutHours = (Convert.ToDecimal(Shift.TimeTo.Value.Subtract(Shift.TimeFrom.Value).Seconds) / 60 / 60) / 2;
+                        var MiddleOfShift = Shift.TimeFrom.Value;
+                        MiddleOfShift += TimeSpan.FromHours(Convert.ToDouble(InOutHours));
+                        if (MiddleOfShift.Subtract(item.LogTime).Seconds > 0)
+                        {
+                            
+                            item.idwInOutMode = (int)InOutMode.In;
+                        }
+                        else{
+                            item.idwInOutMode = (int)InOutMode.Out;
+                        }
+                    }
+
+
+
+
                     emp.FingerLogs.Add(new FingerLog
                     {
                         Code = item.idwEnrollNumber,

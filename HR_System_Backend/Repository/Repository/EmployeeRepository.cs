@@ -73,6 +73,7 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     input.salaryId = null;
                 }
+                
 
 
 
@@ -143,7 +144,11 @@ namespace HR_System_Backend.Repository.Repository
                     DeviceId = input.deviceId,
                     RoleId = input.roleId,
                     Productivity = input.productivity,
-                    Password = input.password
+                    Password = input.password,
+                    MedicalInsurancePercentage=input.medicalInsurancePercentage,
+                    SocialInsurancePercentage=input.socialInsurancePercentage,
+                    MedicalInsurance=input.medicalInsurance,
+                    SocialInsurance=input.socialInsurance
 
                 };
                 // Check if employe poductivity
@@ -392,7 +397,11 @@ namespace HR_System_Backend.Repository.Repository
                     Directory.Delete("documents/" + emp.id.ToString(), true);
                 }
                 var doc = _context.Documents.Where(x => x.EmployeeId == emp.id).ToList();
-                _context.Documents.RemoveRange(doc);
+                if (doc.Count>0)
+                {
+                      _context.Documents.RemoveRange(doc);
+                }
+              
                 await _context.SaveChangesAsync();
                 ////////////////////////////////////
 
@@ -643,6 +652,7 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
+      
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -676,6 +686,42 @@ namespace HR_System_Backend.Repository.Repository
                     return response;
                 }
             }
+            ///////////////////////////////////////////////////////////////////////////
+            //check if social precentage
+            ///////////////////////////////////////////////////////////////////////////
+            if (emp.socialInsurancePercentage != null)
+            {
+                if(emp.socialInsurancePercentage.Value)
+                {
+                    if (emp.socialInsurance.Value >100)
+                    {
+                        response.status =false ;
+                        response.message = "يجب ان لا تتعدى نسبه التامين 100% من المرتب";
+                        return response ;
+                    }
+                }
+                
+            }
+
+               ///////////////////////////////////////////////////////////////////////////
+            //check if social precentage
+            ///////////////////////////////////////////////////////////////////////////
+            if (emp.medicalInsurancePercentage != null)
+            {
+                if(emp.medicalInsurancePercentage.Value)
+                {
+                    if (emp.medicalInsurance.Value >100)
+                    {
+                        response.status =false ;
+                        response.message = "يجب ان لا تتعدى نسبه التامين 100% من المرتب";
+                        return response ;
+                    }
+                }
+                
+            }
+
+
+
 
 
 
@@ -736,7 +782,7 @@ namespace HR_System_Backend.Repository.Repository
             return response;
 
         }
-
+       
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeResponse emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -866,7 +912,6 @@ namespace HR_System_Backend.Repository.Repository
             }
             return images;
         }
-
 
     }
 }

@@ -46,5 +46,9 @@ namespace HR_System_Backend.Model.Input
         public string password { get; set; }
         public bool productivity { get; set; }
         public List<ItemInput> items { get; set; }
+        public bool? medicalInsurancePercentage { get; set; }
+        public bool? socialInsurancePercentage { get; set; }
+        public decimal? socialInsurance { get; set; }
+        public decimal? medicalInsurance { get; set; }
     }
 }

@@ -127,7 +127,20 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<ItemTransactionResponse>();
             try
             {
-                return null;
+                var transaction = await _context.ItemTransactions.Where(x=>x.TarnsId == input.TarnsId).FirstOrDefaultAsync();
+                if(transaction==null){
+                    response.status =false ;
+                    response.message ="لا توجد هذه العملية";
+                    return response ;
+                }  
+                transaction.EmpId=input.EmpId;
+                transaction.ItemId = input.ItemId;
+                transaction.ItemQuantity=input.ItemQuantity ;
+                transaction.ItemComissions=input.ItemComissions;
+                await _context.SaveChangesAsync();
+                response.status =true ;
+                response.message="تم التعديل بنجاح";
+                return response ;
             }
             catch (Exception ex)
             {
@@ -188,7 +201,7 @@ namespace HR_System_Backend.Repository.Repository
                 if (empItems.Count == 0)
                 {
                     response.status = false;
-                    response.message = "";
+                    response.message = "لا يوجد قطع لهذا الموظف";
                     return response;
                 }
                 response.status = true;
@@ -213,7 +226,6 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     id = x.Id,
                     name = x.Name,
-
                     productivity = x.Productivity.Value
                 }).Where(x => x.productivity == true).ToListAsync();
                 if (productivityEmployees.Count == 0)
@@ -302,8 +314,6 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "تم سحب البيانات بنجاح";
                 response.data = transactions;
                 return response;
-
-
             }
             catch (Exception ex)
             {

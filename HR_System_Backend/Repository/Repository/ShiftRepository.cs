@@ -26,18 +26,20 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
                 return response;
             } */
-
-
+             var timeFrom = TimeSpan.Parse(shift.timeFrom);
+             var timeTo = TimeSpan.Parse(shift.timeTo);
+             var shiftHours = Convert.ToDecimal(timeTo.Subtract(timeFrom).Seconds)/60/60 ;
 
             var shft = new Shift
             {
                 ShiftName = shift.shiftName,
                 DateFrom = shift.dateFrom,
                 DateTo = shift.dateTo,
-                TimeFrom = TimeSpan.Parse(shift.timeFrom),
-                TimeTo = TimeSpan.Parse(shift.timeTo),
+                TimeFrom = timeFrom,
+                TimeTo = timeTo,
                 AllowCome=shift.allowCome,
-                AllowLeave=shift.allowLeave
+                AllowLeave=shift.allowLeave,
+                ShiftHour=shiftHours
             };
             try
             {
@@ -53,10 +55,12 @@ namespace HR_System_Backend.Repository.Repository
                     shiftName = shft.ShiftName,
                     dateFrom = shft.DateFrom,
                     dateTo = shft.DateTo,
-                    timeFrom = shft.TimeFrom.ToString(),
-                    timeTo = shft.TimeTo.ToString(),
+                    timeFrom = timeFrom.ToString(),
+                    timeTo = timeTo.ToString(),
                     allowCome=shift.allowCome ,
-                    allowLeave= shift.allowLeave 
+                    allowLeave= shift.allowLeave ,
+                    shiftHour=shiftHours
+
                 });
 
                 return response;
@@ -175,7 +179,8 @@ namespace HR_System_Backend.Repository.Repository
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
                     timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
                     allowCome =x.AllowCome,
-                    allowLeave=x.AllowLeave 
+                    allowLeave=x.AllowLeave ,
+                    shiftHour=x.ShiftHour
                 }).ToListAsync();
                 if (shifts.Count > 0)
                 {
@@ -212,7 +217,8 @@ namespace HR_System_Backend.Repository.Repository
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
                     timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
                     allowCome =x.AllowCome ,
-                    allowLeave=x.AllowLeave
+                    allowLeave=x.AllowLeave,
+                    shiftHour=x.ShiftHour
                 }).FirstOrDefaultAsync();
                 if (shift != null)
                 {
@@ -235,5 +241,7 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
+    
+    
     }
 }

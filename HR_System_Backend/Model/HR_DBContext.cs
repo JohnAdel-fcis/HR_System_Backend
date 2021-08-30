@@ -328,6 +328,12 @@ namespace HR_System_Backend.Model
                     .HasMaxLength(50)
                     .HasColumnName("EMAIL");
 
+                entity.Property(e => e.MedicalInsurance)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("MEDICAL_INSURANCE");
+
+                entity.Property(e => e.MedicalInsurancePercentage).HasColumnName("MEDICAL_INSURANCE_PERCENTAGE");
+
                 entity.Property(e => e.Mobile)
                     .HasMaxLength(20)
                     .HasColumnName("MOBILE");
@@ -357,6 +363,12 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.SalaryTypeId).HasColumnName("SALARY_TYPE_ID");
 
                 entity.Property(e => e.ShiftId).HasColumnName("SHIFT_ID");
+
+                entity.Property(e => e.SocialInsurance)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("SOCIAL_INSURANCE");
+
+                entity.Property(e => e.SocialInsurancePercentage).HasColumnName("SOCIAL_INSURANCE_PERCENTAGE");
 
                 entity.Property(e => e.TimeIn).HasColumnName("TIME_IN");
 
@@ -593,6 +605,10 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.DateTo)
                     .HasColumnType("date")
                     .HasColumnName("DATE_TO");
+
+                entity.Property(e => e.ShiftHour)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("SHIFT_HOUR");
 
                 entity.Property(e => e.ShiftName)
                     .HasMaxLength(100)

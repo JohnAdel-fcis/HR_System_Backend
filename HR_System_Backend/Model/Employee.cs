@@ -41,6 +41,10 @@ namespace HR_System_Backend.Model
         public int? RoleId { get; set; }
         public int? DeviceId { get; set; }
         public string Password { get; set; }
+        public decimal? MedicalInsurance { get; set; }
+        public decimal? SocialInsurance { get; set; }
+        public bool? SocialInsurancePercentage { get; set; }
+        public bool? MedicalInsurancePercentage { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual Department Department { get; set; }

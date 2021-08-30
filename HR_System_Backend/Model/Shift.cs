@@ -20,6 +20,7 @@ namespace HR_System_Backend.Model
         public TimeSpan? TimeTo { get; set; }
         public int? AllowCome { get; set; }
         public int? AllowLeave { get; set; }
+        public decimal? ShiftHour { get; set; }
 
         public virtual ICollection<Employee> Employees { get; set; }
     }
