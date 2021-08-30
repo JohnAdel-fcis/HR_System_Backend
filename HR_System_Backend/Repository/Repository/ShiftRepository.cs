@@ -20,15 +20,15 @@ namespace HR_System_Backend.Repository.Repository
         public async Task<Response<ShiftResponse>> AddShift(ShiftInput shift)
         {
             var response = new Response<ShiftResponse>();
-           /*  if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
-            {
-                response.status = false;
-                response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
-                return response;
-            } */
-             var timeFrom = TimeSpan.Parse(shift.timeFrom);
-             var timeTo = TimeSpan.Parse(shift.timeTo);
-             var shiftHours = Convert.ToDecimal(timeTo.Subtract(timeFrom).Seconds)/60/60 ;
+            /*  if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
+             {
+                 response.status = false;
+                 response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
+                 return response;
+             } */
+            var timeFrom = TimeSpan.Parse(shift.timeFrom);
+            var timeTo = TimeSpan.Parse(shift.timeTo);
+            var shiftHours = Convert.ToDouble(string.Format("{0:0.0}", timeTo.Subtract(timeFrom).TotalHours));
 
             var shft = new Shift
             {
@@ -37,9 +37,9 @@ namespace HR_System_Backend.Repository.Repository
                 DateTo = shift.dateTo,
                 TimeFrom = timeFrom,
                 TimeTo = timeTo,
-                AllowCome=shift.allowCome,
-                AllowLeave=shift.allowLeave,
-                ShiftHour=shiftHours
+                AllowCome = shift.allowCome,
+                AllowLeave = shift.allowLeave,
+                ShiftHour = shiftHours
             };
             try
             {
@@ -55,11 +55,11 @@ namespace HR_System_Backend.Repository.Repository
                     shiftName = shft.ShiftName,
                     dateFrom = shft.DateFrom,
                     dateTo = shft.DateTo,
-                    timeFrom = timeFrom.ToString(),
-                    timeTo = timeTo.ToString(),
-                    allowCome=shift.allowCome ,
-                    allowLeave= shift.allowLeave ,
-                    shiftHour=shiftHours
+                    timeFrom = timeFrom.ToString(@"hh\:mm"),
+                    timeTo = timeTo.ToString(@"hh\:mm"),
+                    allowCome = shift.allowCome,
+                    allowLeave = shift.allowLeave,
+                    shiftHour = shiftHours
 
                 });
 
@@ -132,8 +132,8 @@ namespace HR_System_Backend.Repository.Repository
                     DateTo = shift.dateTo,
                     TimeFrom = TimeSpan.Parse(shift.timeFrom),
                     TimeTo = TimeSpan.Parse(shift.timeTo),
-                    AllowCome =shift.allowCome ,
-                    AllowLeave =shift.allowLeave
+                    AllowCome = shift.allowCome,
+                    AllowLeave = shift.allowLeave
                 };
 
                 _context.Entry(shft).State = EntityState.Detached;
@@ -151,8 +151,8 @@ namespace HR_System_Backend.Repository.Repository
                     dateTo = shft.DateTo,
                     timeFrom = shft.TimeFrom.ToString(),
                     timeTo = shft.TimeTo.ToString(),
-                    allowCome =shift.allowCome ,
-                    allowLeave =shift.allowLeave
+                    allowCome = shift.allowCome,
+                    allowLeave = shift.allowLeave
                 });
 
                 return response;
@@ -178,9 +178,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateTo = x.DateTo,
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
                     timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
-                    allowCome =x.AllowCome,
-                    allowLeave=x.AllowLeave ,
-                    shiftHour=x.ShiftHour
+                    allowCome = x.AllowCome,
+                    allowLeave = x.AllowLeave,
+                    shiftHour = x.ShiftHour
                 }).ToListAsync();
                 if (shifts.Count > 0)
                 {
@@ -216,9 +216,9 @@ namespace HR_System_Backend.Repository.Repository
                     dateTo = x.DateTo,
                     timeFrom = x.TimeFrom.Value.ToString(@"hh\:mm"),
                     timeTo = x.TimeTo.Value.ToString(@"hh\:mm"),
-                    allowCome =x.AllowCome ,
-                    allowLeave=x.AllowLeave,
-                    shiftHour=x.ShiftHour
+                    allowCome = x.AllowCome,
+                    allowLeave = x.AllowLeave,
+                    shiftHour = x.ShiftHour
                 }).FirstOrDefaultAsync();
                 if (shift != null)
                 {
@@ -241,7 +241,7 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
-    
-    
+
+
     }
 }

@@ -606,9 +606,7 @@ namespace HR_System_Backend.Model
                     .HasColumnType("date")
                     .HasColumnName("DATE_TO");
 
-                entity.Property(e => e.ShiftHour)
-                    .HasColumnType("decimal(18, 0)")
-                    .HasColumnName("SHIFT_HOUR");
+                entity.Property(e => e.ShiftHour).HasColumnName("SHIFT_HOUR");
 
                 entity.Property(e => e.ShiftName)
                     .HasMaxLength(100)

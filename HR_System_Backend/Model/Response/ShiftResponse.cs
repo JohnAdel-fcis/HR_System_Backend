@@ -15,6 +15,6 @@ namespace HR_System_Backend.Model.Response
         public string timeTo { get; set; }
          public int? allowCome { get; set; }
         public int? allowLeave { get; set; }
-        public decimal? shiftHour { get; set; }
+        public double? shiftHour { get; set; }
     }
 }
