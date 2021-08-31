@@ -183,6 +183,10 @@ namespace HR_System_Backend.Repository.Repository
                             item.idwInOutMode = (int)InOutMode.Out;
                         }
                     }
+                    else
+                    {
+                        item.idwInOutMode = null;
+                    }
                     emp.FingerLogs.Add(new FingerLog
                     {
                         Code = item.idwEnrollNumber,

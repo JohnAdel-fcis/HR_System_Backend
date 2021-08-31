@@ -43,7 +43,9 @@ namespace HR_System_Backend
                     {
                         return CustomErrorResponse(actionContext);
                     };
-                });
+                }).AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             BadRequestObjectResult CustomErrorResponse(ActionContext actionContext)
             {
                 Response<int> res = new Response<int>();
