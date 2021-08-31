@@ -9,7 +9,7 @@ namespace HR_System_Backend.Model.Helper
         public int? idwVerifyMode { get; set; }
         public int? idwInOutMode { get; set; }
         public DateTime LogDate { get; set; }
-        public TimeSpan LogTime { get; set; }
+        public string LogTime { get; set; }
         public int? deviceId { get; set; }
     }
 }

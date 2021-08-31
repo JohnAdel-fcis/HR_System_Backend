@@ -173,7 +173,7 @@ namespace HR_System_Backend.Repository.Repository
                         var InOutHours = (Convert.ToDecimal(Shift.TimeTo.Value.Subtract(Shift.TimeFrom.Value).TotalHours)) / 2;
                         var MiddleOfShift = Shift.TimeFrom.Value;
                         MiddleOfShift += TimeSpan.FromHours(Convert.ToDouble(InOutHours));
-                        if (MiddleOfShift.Subtract(item.LogTime).TotalMilliseconds > 0)
+                        if (MiddleOfShift.Subtract(TimeSpan.Parse(item.LogTime)).TotalMilliseconds > 0)
                         {
 
                             item.idwInOutMode = (int)InOutMode.In;
@@ -187,11 +187,11 @@ namespace HR_System_Backend.Repository.Repository
                     {
                         Code = item.idwEnrollNumber,
                         LogDate = item.LogDate,
-                        LogTime = item.LogTime,
+                        LogTime = TimeSpan.Parse(item.LogTime),
                         InOut = item.idwInOutMode
                     });
                     var date = item.LogDate;
-                    var time = item.LogTime;
+                    var time = TimeSpan.Parse(item.LogTime);
                     var workTime = emp.WorkTimes.Where(x => x.WorkDate == date).FirstOrDefault();
                     // var test = _context.FingerLogs.Where(x => (x.LogDate == date && x.InOut == 0)).LastOrDefault();
                     if (workTime == null)
@@ -431,7 +431,7 @@ namespace HR_System_Backend.Repository.Repository
                             idwVerifyMode = idwVerifyMode,
                             idwInOutMode = idwInOutMode,
                             LogDate = new DateTime(idwYear, idwMonth, idwDay).Date,
-                            LogTime = new TimeSpan(idwHour, idwMinute, idwSecond),
+                            LogTime = new TimeSpan(idwHour, idwMinute, idwSecond).ToString(@"hh:mm"),
                             name = name
                         });
                     }
@@ -549,7 +549,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority }).ToListAsync();
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority , deviceName = x.DeviceName}).ToListAsync();
                 if (devices.Count == 0)
                 {
                     response.status = false;
