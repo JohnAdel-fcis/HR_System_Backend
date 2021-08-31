@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace HR_System_Backend.Repository.Repository
@@ -17,6 +18,87 @@ namespace HR_System_Backend.Repository.Repository
         {
             _context = context;
         }
+
+        public async Task<Response<OverTimeResponse>> AddOverTime(OverTimeInput input)
+        {
+            var response = new Response<OverTimeResponse>();
+            try
+            {
+                var employee = await _context.Employees.Include(x=>x.Holiday).Include(X => X.SalaryType).Include(x=>x.WorkTimes).Where(x => x.Id == input.empId).FirstOrDefaultAsync();
+                if (employee == null)
+                {
+                    response.status = false;
+                    response.message = "الموظف غير موجود";
+                    return response;
+                }
+                var overhourPrice = input.overHourPrice;
+                if (input.overTimePercentage != 0 && input.overTimePercentage != null)
+                {
+                    if (employee.Productivity.Value && employee.SalaryType == null)
+                    {
+                        response.status = false;
+                        response.message = "الموظف ليس له ساعات اضافيه لانه انتاجي";
+                        return response;
+                    }
+                    if (!employee.Productivity.Value && employee.SalaryType == null)
+                    {
+                         response.status = false;
+                        response.message = "يجب ادخال نوع الراتب للموظف بنظام الساعات";
+                        return response;
+                    }
+                    else
+                    {
+                        var hourPrice = getHourPrice(employee);
+                        overhourPrice = hourPrice * (input.overTimePercentage / 100);
+                    }
+                }
+                var TotalOverTimePrice = overhourPrice * input.hours;
+                var overTime = new OverTime
+                {
+                    OverTimeHours = input.hours.Value,
+                    OverTimeDate = input.date,
+                    OverHourPrice = input.overHourPrice,
+                    OverTimePercentage = input.overTimePercentage,
+                    Notes = input.note,
+                    OverTimeTotal = TotalOverTimePrice
+                };
+                var workTime = employee.WorkTimes.Where(x => x.WorkDate == overTime.OverTimeDate).FirstOrDefault();
+                if (workTime == null)
+                {
+                    employee.WorkTimes.Add(new WorkTime
+                    {
+                        WorkDate = overTime.OverTimeDate,
+                        OverTime = overTime
+                    });
+                }
+                else
+                {
+                    workTime.OverTime = overTime;
+                }
+                await _context.SaveChangesAsync();
+                response.status = true;
+                response.message = "تم اضافة العمل الإضافي";
+                response.data.Add(new OverTimeResponse
+                {
+                    OverTimeId = overTime.OverTimeId,
+                    OverHourPrice = overTime.OverHourPrice,
+                    OverTimePercentage = overTime.OverTimePercentage,
+                    OverTimeHours = overTime.OverTimeHours,
+                    Notes = overTime.Notes,
+                    OverTimeDate = overTime.OverTimeDate,
+                    OverTimeTotal = overTime.OverTimeTotal
+
+                });
+                return response;
+            }
+            catch (System.Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+        }
+
         public async Task<Response<ShiftResponse>> AddShift(ShiftInput shift)
         {
             var response = new Response<ShiftResponse>();
@@ -149,8 +231,8 @@ namespace HR_System_Backend.Repository.Repository
                     shiftName = shft.ShiftName,
                     dateFrom = shft.DateFrom,
                     dateTo = shft.DateTo,
-                    timeFrom = shft.TimeFrom.ToString(),
-                    timeTo = shft.TimeTo.ToString(),
+                    timeFrom = shft.TimeFrom.Value.ToString(@"hh\:mm"),
+                    timeTo = shft.TimeTo.Value.ToString(@"hh\:mm"),
                     allowCome = shift.allowCome,
                     allowLeave = shift.allowLeave
                 });
@@ -242,6 +324,54 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+        private double getHourPrice(Employee emp)
+        {
+            var NumWorkDaysInWeek = 0;
+            var holiday = emp.Holiday;
+            foreach (PropertyInfo prop in holiday.GetType().GetProperties())
+            {
+                if (prop == typeof(Nullable))
+                {
+                    continue;
+                }
+                var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                
+                if (type == typeof(bool))
+                {
+                    if (!(bool)prop.GetValue(holiday, null))
+                    {
+                        NumWorkDaysInWeek++;
+                    }
+                }
+            }
+            if (emp.SalaryType.SalaryTypeName == "شهري")
+            {
+                var numWorkDayInMonth = NumWorkDaysInWeek * 4;
+                var baseSalary = emp.Salary;
+                var dayPrice = baseSalary / numWorkDayInMonth;
+                var numWorkingHour = emp.BaseTime;
+                var hourPrice = Convert.ToDouble(dayPrice / numWorkingHour);
+                return hourPrice;
+            }
+            else if (emp.SalaryType.SalaryTypeName == "أسبوعي")
+            {
 
+                var baseSalary = emp.Salary;
+                var dayPrice = baseSalary / NumWorkDaysInWeek;
+                var numWorkingHour = emp.BaseTime;
+                var hourPrice = Convert.ToDouble(dayPrice / numWorkingHour);
+                return hourPrice;
+            }
+            else if (emp.SalaryType.SalaryTypeName == "يومي")
+            {
+                var baseSalary = emp.Salary;
+                var dayPrice = baseSalary;
+                var numWorkingHour = emp.BaseTime;
+                var hourPrice = Convert.ToDouble(dayPrice / numWorkingHour);
+                return hourPrice;
+            }
+
+            return 0;
+        }
     }
 }

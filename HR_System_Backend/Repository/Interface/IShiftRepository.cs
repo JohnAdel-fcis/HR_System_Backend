@@ -14,6 +14,7 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<ShiftResponse>> AddShift(ShiftInput shift);
         Task<Response<ShiftResponse>> EditShift(ShiftResponse shift);
         Task<Response<ShiftResponse>> DeleteShift(int id);
+        Task<Response<OverTimeResponse>> AddOverTime(OverTimeInput input);
 
 
     }

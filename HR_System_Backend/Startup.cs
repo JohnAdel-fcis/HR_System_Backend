@@ -21,14 +21,14 @@ namespace HR_System_Backend
     public class Startup
     {
         private string _contentRootPath = "";
-        public Startup(IConfiguration configuration,Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
+        public Startup(IConfiguration configuration, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _contentRootPath = env.ContentRootPath;
             Configuration = configuration;
-             
-           
+
+
         }
-    
+
 
         public IConfiguration Configuration { get; }
 
@@ -43,8 +43,7 @@ namespace HR_System_Backend
                     {
                         return CustomErrorResponse(actionContext);
                     };
-                }).AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                });
             BadRequestObjectResult CustomErrorResponse(ActionContext actionContext)
             {
                 Response<int> res = new Response<int>();
@@ -63,7 +62,7 @@ namespace HR_System_Backend
             });
             //var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var connectionString = Configuration.GetConnectionString("PharosConnection");
-            
+
             if (connectionString.Contains("%CONTENTROOTPATH%"))
             {
                 connectionString = connectionString.Replace("%CONTENTROOTPATH%", _contentRootPath);
@@ -90,6 +89,7 @@ namespace HR_System_Backend
             services.AddTransient<IDebitRepository, DebitRepository>();
             services.AddTransient<IFingerRepository, FingerRepository>();
             services.AddTransient<IProductiviyRepository, ProductiviyRepository>();
+            services.AddTransient<IReportRepository, ReportRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -43,12 +43,12 @@ namespace HR_System_Backend.Controllers
         }
 
         [HttpGet]
-        [Route("GetEmployeeItems")]
-        public async Task<IActionResult> GetEmployeeItems(int empId)
+        [Route("GetEmployeeItems/{id}")]
+        public async Task<IActionResult> GetEmployeeItems(int id)
         {
             try
             {
-                var response = await Irepo.GetEmployeeItems(empId);
+                var response = await Irepo.GetEmployeeItems(id);
                 if (!response.status)
                 {
                     return NotFound(response);
@@ -119,12 +119,12 @@ namespace HR_System_Backend.Controllers
 
 
         [HttpGet]
-        [Route("GetAllEmployeeTransactions")]
-        public async Task<IActionResult> GetAllEmployeeTransactions(int empId)
+        [Route("GetAllEmployeeTransactions/{id}")]
+        public async Task<IActionResult> GetAllEmployeeTransactions(int id)
         {
             try
             {
-                var response = await Irepo.GetAllEmployeeTransactions(empId);
+                var response = await Irepo.GetAllEmployeeTransactions(id);
                 if (!response.status)
                 {
                     return NotFound(response);

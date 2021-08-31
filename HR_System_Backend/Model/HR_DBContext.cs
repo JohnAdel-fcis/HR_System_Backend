@@ -20,6 +20,7 @@ namespace HR_System_Backend.Model
         public virtual DbSet<BounseDiscount> BounseDiscounts { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Covenant> Covenants { get; set; }
+        public virtual DbSet<Creation> Creations { get; set; }
         public virtual DbSet<Debit> Debits { get; set; }
         public virtual DbSet<DebitTransaction> DebitTransactions { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
@@ -128,6 +129,17 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.Covenants)
                     .HasForeignKey(d => d.EmplyeeId)
                     .HasConstraintName("FK__COVENANT__EMPLYE__3A81B327");
+            });
+
+            modelBuilder.Entity<Creation>(entity =>
+            {
+                entity.ToTable("CREATION");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.EmpDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("EMP_DATE");
             });
 
             modelBuilder.Entity<Debit>(entity =>

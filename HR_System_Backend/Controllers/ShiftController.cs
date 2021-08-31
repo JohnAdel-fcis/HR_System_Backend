@@ -36,9 +36,9 @@ namespace HR_System_Backend.Controllers
             {
                 return NotFound(response);
             }
-           
+
         }
-        
+
         [HttpGet]
         [Route("Get/{id}")]
         public async Task<IActionResult> Get(int id)
@@ -57,7 +57,7 @@ namespace HR_System_Backend.Controllers
 
         [HttpPost]
         [Route("Add")]
-        public async Task<IActionResult> Add([FromBody]ShiftInput input)
+        public async Task<IActionResult> Add([FromBody] ShiftInput input)
         {
             var response = await Irepo.AddShift(input);
             if (response.status)
@@ -70,9 +70,26 @@ namespace HR_System_Backend.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("AddOvertime")]
+        public async Task<IActionResult> AddOvertime([FromBody] OverTimeInput input)
+        {
+            var response = await Irepo.AddOverTime(input);
+            if (response.status)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return NotFound(response);
+            }
+        }
+
+
         [HttpPost]
         [Route("Edit")]
-        public async Task<IActionResult> Edit([FromBody]ShiftResponse input)
+        public async Task<IActionResult> Edit([FromBody] ShiftResponse input)
         {
             var response = await Irepo.EditShift(input);
             if (response.status)

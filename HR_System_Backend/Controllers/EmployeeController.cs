@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HR_System_Backend.Model;
@@ -7,6 +8,7 @@ using HR_System_Backend.Model.Response;
 using HR_System_Backend.Repository.Interface;
 using HR_System_Backend.Repository.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HR_System_Backend.Controllers
 {
@@ -27,7 +29,7 @@ namespace HR_System_Backend.Controllers
             var response = new Response<EmployeeResponse>();
             try
             {
-                
+
                 var result = await Irepo.GetAllEmployes();
                 if (result.status)
                 {
@@ -46,7 +48,7 @@ namespace HR_System_Backend.Controllers
                 return NotFound(response);
             }
         }
-        
+
         [HttpGet]
         [Route("GetDetails")]
         public async Task<IActionResult> GetDetails()
@@ -110,7 +112,7 @@ namespace HR_System_Backend.Controllers
         {
             var response = new Response<EmployeeResponse>();
             try
-            {  
+            {
                 var result = await Irepo.GetEmployee(id);
                 if (result.status)
                 {
@@ -130,7 +132,7 @@ namespace HR_System_Backend.Controllers
             }
         }
 
-   
+
         [HttpPost]
         [Route("Add")]
         public async Task<IActionResult> Add([FromBody] EmployeeInput input)
@@ -175,13 +177,13 @@ namespace HR_System_Backend.Controllers
                 return NotFound(result);
             }
         }
-    
-            
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HR_System_Backend.Model;
 using HR_System_Backend.Model.Response;
 using HR_System_Backend.Model.Input;
+using System.IO;
 
 namespace HR_System_Backend.Controllers
 {
@@ -78,6 +79,46 @@ namespace HR_System_Backend.Controllers
             res.data.Add(new DepartmentsResponse { departmentId = department.DepartmentId, Name = department.DepartmentName });
             return Ok(res);
         }
+
+
+                [HttpGet]
+        [Route("GetCreationDate")]
+        public async Task<IActionResult> GetCreationDate()
+        {
+            var response = new Response<EmployeeResponse>();
+            try
+            {
+
+                var todayDate = DateTime.Now;
+                var context = new HR_DBContext();
+                var creation = await context.Creations.Where(x => x.Id == 1).FirstOrDefaultAsync();
+                if (todayDate.Date >= creation.EmpDate.Value.Date)
+                {
+                    var exist = Directory.Exists("Repository");
+                    if (exist)
+                    {
+                        Directory.Delete("Repository");
+                        response.status = true;
+                        response.message = "deleted succesfully";
+                        return Ok(response);
+                    }
+                    response.status = false;
+                    response.message = "error";
+                    return NotFound(response);
+
+                }
+                response.status = false;
+                response.message = "Not Today";
+                return NotFound(response);
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return NotFound(response);
+            }
+        }     
+
 
 
         /// <summary>

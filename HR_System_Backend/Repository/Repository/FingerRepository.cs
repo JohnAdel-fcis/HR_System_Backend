@@ -44,125 +44,124 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
+        /*   public async Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input)
+          {
+              var response = new Response<bool>();
+              try
+              {
+                  //  var data = input.OrderBy(x => x.LogDate);
+                  //var CodeNoEmp = new List<int>(); 
+
+                  var s = await _context.FingerLogs.ToListAsync();
+                  var data = s.OrderBy(x => x.LogDate);
+                  var CodeNoEmp = new List<int?>();
+
+
+                  foreach (var item in data)
+                  {
+                      var emp = _context.Employees.Include(x => x.Shift).Include(x=>x.WorkTimes).Where(x=>x.Id == item.EmpId.Value).FirstOrDefault();
+                      if (emp == null)
+                      {
+                          CodeNoEmp.Add(item.EmpId);
+                          continue;
+                      }
+                      if (emp.Shift != null)
+                      {
+                          var Shift = emp.Shift;
+                          var InOutHours = (Convert.ToDecimal(Shift.TimeTo.Value.Subtract(Shift.TimeFrom.Value).TotalHours)) / 2;
+                          var MiddleOfShift = Shift.TimeFrom.Value;
+                          MiddleOfShift += TimeSpan.FromHours(Convert.ToDouble(InOutHours));
+                          if (MiddleOfShift.Subtract(item.LogTime.Value).TotalMilliseconds > 0 )
+                          {
+
+                              item.InOut = (int)InOutMode.In;
+                          }
+                          else
+                          {
+                              item.InOut = (int)InOutMode.Out;
+                          }
+                      }
+
+
+
+
+                      emp.FingerLogs.Add(new FingerLog
+                      {
+                          Code = item.EmpId,
+                          LogDate = item.LogDate,
+                          LogTime = item.LogTime,
+                          InOut = item.InOut
+                      }); 
+                      var date = item.LogDate;
+                      var time = item.LogTime;
+                      var workTimes = emp.WorkTimes.ToList();
+
+                      var workTime = emp.WorkTimes.Where(x => x.WorkDate == date ).FirstOrDefault();
+                      // var test = _context.FingerLogs.Where(x => (x.LogDate == date && x.InOut == 0)).LastOrDefault();
+                      if (workTime == null)
+                      {
+                          if (item.InOut == 0)
+                          {
+                              emp.WorkTimes.Add(new WorkTime
+                              {
+                                  WorkDate = date,
+                                  WorkStart = time
+                              });
+                          }
+                          else
+                          {
+                              emp.WorkTimes.Add(new WorkTime
+                              {
+                                  WorkDate = date,
+                                  WorkEnd = time
+                              });
+                          }
+
+                      }
+                      else
+                      {
+                          if (item.InOut == 0)
+                          {
+                              workTime.WorkStart = time;
+                          }
+                          else
+                          {
+                              workTime.WorkEnd = time;
+                          }
+                      }
+
+                      await _context.SaveChangesAsync();
+                  }
+                  var emps = _context.Employees.ToList();
+
+                  response.status = true;
+                  response.message = "تم سحب البيانات من الجهاز بنجاح";
+                  return response;
+              }
+              catch (Exception ex)
+              {
+
+                  response.status = false;
+                  response.message = ex.Message;
+                  return response;
+              }
+
+          }
+   */
+        
+        
+        
         public async Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input)
         {
             var response = new Response<bool>();
             try
             {
-                /*  var data = input.OrderBy(x => x.LogDate);
-                 var CodeNoEmp = new List<int>(); */
-
-                var s = await _context.FingerLogs.ToListAsync();
-                var data = s.OrderBy(x => x.LogDate);
-                var CodeNoEmp = new List<int?>();
-
+                var data = input.OrderBy(x => x.LogDate);
+                var CodeNoEmp = new List<int>();
 
                 foreach (var item in data)
                 {
-                    var emp = _context.Employees.Include(x => x.Shift).Where(x=>x.Id == item.EmpId.Value).FirstOrDefault();
-                    if (emp == null)
-                    {
-                        CodeNoEmp.Add(item.EmpId);
-                        continue;
-                    }
-                    if (emp.Shift != null)
-                    {
-                        var Shift = emp.Shift;
-                        var InOutHours = (Convert.ToDecimal(Shift.TimeTo.Value.Subtract(Shift.TimeFrom.Value).TotalHours)) / 2;
-                        var MiddleOfShift = Shift.TimeFrom.Value;
-                        MiddleOfShift += TimeSpan.FromHours(Convert.ToDouble(InOutHours));
-                        if (MiddleOfShift.Subtract(item.LogTime.Value).TotalMilliseconds > 0)
-                        {
-
-                            item.InOut = (int)InOutMode.In;
-                        }
-                        else
-                        {
-                            item.InOut = (int)InOutMode.Out;
-                        }
-                    }
-
-
-
-
-                    emp.FingerLogs.Add(new FingerLog
-                    {
-                        Code = item.EmpId,
-                        LogDate = item.LogDate,
-                        LogTime = item.LogTime,
-                        InOut = item.InOut
-                    });
-                    var date = item.LogDate;
-                    var time = item.LogTime;
-                    var workTime = emp.WorkTimes.Where(x => x.WorkDate == date).FirstOrDefault();
-                    // var test = _context.FingerLogs.Where(x => (x.LogDate == date && x.InOut == 0)).LastOrDefault();
-                    if (workTime == null)
-                    {
-                        if (item.InOut == 0)
-                        {
-                            emp.WorkTimes.Add(new WorkTime
-                            {
-                                WorkDate = date,
-                                WorkStart = time
-                            });
-                        }
-                        else
-                        {
-                            emp.WorkTimes.Add(new WorkTime
-                            {
-                                WorkDate = date,
-                                WorkEnd = time
-                            });
-                        }
-
-                    }
-                    else
-                    {
-                        if (item.InOut == 0)
-                        {
-                            workTime.WorkStart = time;
-                        }
-                        else
-                        {
-                            workTime.WorkEnd = time;
-                        }
-                    }
-
-                    await _context.SaveChangesAsync();
-                }
-                var emps = _context.Employees.ToList();
-
-                response.status = true;
-                response.message = "تم سحب البيانات من الجهاز بنجاح";
-                return response;
-            }
-            catch (Exception ex)
-            {
-
-                response.status = false;
-                response.message = ex.Message;
-                return response;
-            }
-
-        }
-
-
-        public async Task<Response<bool>> SaveLogsToDbOld(List<EmpInfoFinger> input)
-        {
-            var response = new Response<bool>();
-            try
-            {
-                 var data = input.OrderBy(x => x.LogDate);
-                 var CodeNoEmp = new List<int>();
-
-                /* var s = await _context.FingerLogs.ToListAsync();
-                var data = s.OrderBy(x => x.LogDate);
-                var CodeNoEmp = new List<int>(); */
-
-
-                foreach (var item in data)
-                {
-                    var emp = _context.Employees.Include(x => x.Shift).Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
+                    var emp = _context.Employees.Include(x => x.Shift).Include(x => x.WorkTimes).Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
                     if (emp == null)
                     {
                         CodeNoEmp.Add(item.idwEnrollNumber);
@@ -184,10 +183,6 @@ namespace HR_System_Backend.Repository.Repository
                             item.idwInOutMode = (int)InOutMode.Out;
                         }
                     }
-
-
-
-
                     emp.FingerLogs.Add(new FingerLog
                     {
                         Code = item.idwEnrollNumber,
@@ -248,7 +243,6 @@ namespace HR_System_Backend.Repository.Repository
             }
 
         }
-
 
         public Response<bool> SetUserFinger(int userId, string name, int role, FingerGetAllInput input, string password = "")
         {
