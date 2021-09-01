@@ -569,6 +569,7 @@ namespace HR_System_Backend.Repository.Repository
                                             baseTime = x.BaseTime,
                                             createdDate = x.CreateDate,
                                             departmentId = x.DepartmentId,
+                                            code=x.Code,
                                             holiday = new Week
                                             {
                                                 Saturday = x.Holiday.Saturday,

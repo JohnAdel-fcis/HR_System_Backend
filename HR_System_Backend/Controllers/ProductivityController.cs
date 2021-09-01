@@ -65,7 +65,7 @@ namespace HR_System_Backend.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetTransactionsByDate")]
         public async Task<IActionResult> GetTransactionsByDate(ProductivitySalaryInput input)
         {

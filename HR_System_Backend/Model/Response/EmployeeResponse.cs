@@ -34,5 +34,6 @@ namespace HR_System_Backend.Model.Response
         public string password { get; set; }
         public bool productivity { get; set; }
         public List<ItemResponse> items { get; set; }
+        public int? code { get; set; }
     }
 }
