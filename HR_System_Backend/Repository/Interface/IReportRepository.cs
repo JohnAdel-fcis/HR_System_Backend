@@ -7,5 +7,8 @@ namespace HR_System_Backend.Repository.Interface
     public interface IReportRepository
     {
          Task<Response<AttendLeaveReportResponse>> AttendAndLeaveReport(AttendLeaveReportInput input);
+        Task<Response<ProductivitySalaryReportResponse>> ProductivitySalaryReport(ProductivitySalaryInput input);
+
+
     }
 }

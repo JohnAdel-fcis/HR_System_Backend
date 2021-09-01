@@ -32,6 +32,21 @@ namespace HR_System_Backend.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("GetProductivitySalaryReport")]
+        public async Task<IActionResult> GetProductivitySalaryReport(ProductivitySalaryInput input)
+        {
+            var response = await Irepo.ProductivitySalaryReport(input);
+            if (response.status)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return NotFound(response);
+            }
+        }
+
 
 
 

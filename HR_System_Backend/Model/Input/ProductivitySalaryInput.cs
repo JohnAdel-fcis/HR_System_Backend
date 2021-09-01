@@ -7,7 +7,7 @@ namespace HR_System_Backend.Model.Input
 {
     public class ProductivitySalaryInput
     {
-        public int EmployeeId { get; set; }
+        public int? EmployeeId { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
     }

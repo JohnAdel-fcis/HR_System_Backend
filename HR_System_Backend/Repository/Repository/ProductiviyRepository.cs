@@ -83,6 +83,7 @@ namespace HR_System_Backend.Repository.Repository
 
         public async Task<Response<ProductivitySalaryResponse>> CalculateSalary(ProductivitySalaryInput input)
         {
+           
             var response = new Response<ProductivitySalaryResponse>();
             try
             {

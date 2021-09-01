@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dell\\Source\\Repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj": {}
+    "C:\\Users\\dell\\source\\repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dell\\Source\\Repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj": {
+    "C:\\Users\\dell\\source\\repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dell\\Source\\Repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj",
+        "projectUniqueName": "C:\\Users\\dell\\source\\repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj",
         "projectName": "HR_System_Backend",
-        "projectPath": "C:\\Users\\dell\\Source\\Repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj",
+        "projectPath": "C:\\Users\\dell\\source\\repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj",
         "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dell\\Source\\Repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\obj\\",
+        "outputPath": "C:\\Users\\dell\\source\\repos\\JohnAdel-fcis\\HR_System_Backend\\HR_System_Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",

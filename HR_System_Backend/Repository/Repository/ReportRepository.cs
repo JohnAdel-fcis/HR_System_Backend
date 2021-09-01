@@ -81,5 +81,103 @@ namespace HR_System_Backend.Repository.Repository
             }
 
         }
+        public async Task<Response<ProductivitySalaryReportResponse>> ProductivitySalaryReport(ProductivitySalaryInput input)
+        {
+            var response = new Response<ProductivitySalaryReportResponse>();
+            try
+            {
+                if (input.EmployeeId == null)
+                {
+                    var productivityEmployees = await _context.Employees.Include(x => x.ItemTransactions)
+                        .Where(x => x.Productivity == true && x.SalaryTypeId == null)
+                        .ToListAsync();
+
+                    if (productivityEmployees.Count == 0)
+                    {
+                        response.status = false;
+                        response.message = "لا يوجد عمال انتاجية";
+                        return response;
+                    }
+                    foreach (var employee in productivityEmployees)
+                    {
+                        int? numOfItems = 0;
+                        double? salary = 0;
+                        var transactions = employee.ItemTransactions.Where(x=>(x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date>=input.To?.Date)   )?.ToList();
+                        if (transactions.Count != 0)
+                        {
+                            foreach (var transaction in transactions)
+                            {
+                                salary += transaction?.ItemComissions;
+                                numOfItems += transaction?.ItemQuantity;
+                            }
+                            response.data.Add(new ProductivitySalaryReportResponse
+                            {
+                                EmployeeId = employee.Id,
+                                From = input.From,
+                                To = input.To,
+                                ItemsNum = numOfItems,
+                                Salary = salary
+                            });
+
+                        }
+                    }
+                    response.status = true;
+                    response.message = "تم سحب التقرير بنجاح";
+                    return response;
+
+                }
+                else
+                {
+                    var employee = await _context.Employees.Include(x => x.ItemTransactions)
+                .Where(x => x.Productivity == true && x.SalaryTypeId == null && x.Id == input.EmployeeId)
+                .FirstOrDefaultAsync();
+
+                    if (employee == null)
+                    {
+                        response.status = false;
+                        response.message = "العامل غير موجود بالانتاجية";
+                        return response;
+                    }
+                    int? numOfItems = 0;
+                    double? salary = 0;
+                    var transactions = employee.ItemTransactions.Where(x => (x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date >= input.To?.Date))?.ToList();
+                    if (transactions.Count != 0)
+                    {
+                        foreach (var transaction in transactions)
+                        {
+                            salary += transaction?.ItemComissions;
+                            numOfItems += transaction?.ItemQuantity;
+                        }
+                        response.data.Add(new ProductivitySalaryReportResponse
+                        {
+                            EmployeeId = employee.Id,
+                            From = input.From,
+                            To = input.To,
+                            ItemsNum = numOfItems,
+                            Salary = salary
+                        });
+                        response.status = true;
+                        response.message = "تم سحب تقرير العامل بنجاح";
+                        return response;
+                    }
+                    else
+                    {
+                        response.status = false;
+                        response.message = "لا يوجد عمليات لهذا العامل";
+                        return response;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+        }
+
+
+
+
     }
 }
