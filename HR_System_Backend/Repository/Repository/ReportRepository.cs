@@ -113,7 +113,7 @@ namespace HR_System_Backend.Repository.Repository
                     {
                         int? numOfItems = 0;
                         double? salary = 0;
-                        var transactions = employee.ItemTransactions.Where(x => (x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date >= input.To?.Date))?.ToList();
+                        var transactions = employee.ItemTransactions.Where(x => (x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date <= input.To?.Date))?.ToList();
                         if (transactions.Count != 0)
                         {
                             foreach (var transaction in transactions)
@@ -229,7 +229,7 @@ namespace HR_System_Backend.Repository.Repository
                             //calculate productivity salary 
                             if (employee.Productivity != null && employee.Productivity.Value)
                             {
-                                var transactions = employee.ItemTransactions.Where(x => (x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date >= input.To?.Date))?.ToList();
+                                var transactions = employee.ItemTransactions.Where(x => (x.TransDate?.Date >= input.From?.Date && x.TransDate?.Date <= input.To?.Date))?.ToList();
                                 if (transactions.Count != 0)
                                 {
                                     foreach (var transaction in transactions)
@@ -252,14 +252,14 @@ namespace HR_System_Backend.Repository.Repository
                                 code=employee.Code,
                                 SalaryType=employee.SalaryType.SalaryTypeName,
                                 itemsNumber = numOfItems,
-                                productivitySalary=productivitySalary,
+                                productivitySalary= Convert.ToDouble(string.Format("{0:0.0}", productivitySalary    )),
                                 workDays=actualDays,
                                 scheduledDays=scheduledDays,
                                 holidays=holidays,
                                 absenceDays=absenceDays,
-                                dayPrice=dayPrice ,
-                                workHours=workHours,
-                                salaryForDate=salaryForDate,
+                                dayPrice= Convert.ToDouble(string.Format("{0:0.0}", dayPrice)),
+                                workHours= Convert.ToDouble(string.Format("{0:0.0}",workHours)),
+                                salaryForDate= Convert.ToDouble(string.Format("{0:0.0}", salaryForDate)),
                                 baseSalary = Convert.ToDouble(employee.Salary),
                                 dateFrom = input.From,
                                 dateTo =input.To
@@ -499,6 +499,10 @@ namespace HR_System_Backend.Repository.Repository
             double? numOfHolidayDaysInWeek = 7 - numWorkDaysInWeek;
             double? numOfHolidayDaysInMonth = numOfHolidayDaysInWeek * 4;
             double? numOfWorkDaysInMonth = 30 - numOfHolidayDaysInMonth;
+            if (numOfHolidayDaysInWeek == 7)
+            {
+                numOfWorkDaysInMonth = 0;
+            }
             //Salary Type id = 1 ->>>> Month
             //Salary Type id = 2 ->>>> Week
             //Salary Type id = 3 ->>>> day
@@ -507,7 +511,7 @@ namespace HR_System_Backend.Repository.Repository
             {
                 case 1:
                     {
-                        daySalary = Convert.ToDouble(emp.Salary.Value) / numOfWorkDaysInMonth;
+                        daySalary = Convert.ToDouble(emp.Salary??=0) / numOfWorkDaysInMonth;
                         break;
                     }
                 case 2:
