@@ -262,8 +262,8 @@ namespace HR_System_Backend.Repository.Repository
                     TransDate = x.TransDate,
                     TarnsId = x.TarnsId
                 }).Where(
-                    x => x.TransDate.Value.Second >= input.From.Value.Second &&
-                    x.TransDate.Value.Second <= input.To.Value.Second
+                    x => x.TransDate.Value >= input.From.Value &&
+                    x.TransDate.Value <= input.To.Value
                     ).ToListAsync();
 
                 if (transactions.Count == 0)
@@ -301,8 +301,8 @@ namespace HR_System_Backend.Repository.Repository
                     TransDate = x.TransDate,
                     TarnsId = x.TarnsId
                 }).Where(
-                    x => (x.EmpId == input.EmployeeId) && (x.TransDate.Value.Second >= input.From.Value.Second &&
-                    x.TransDate.Value.Second <= input.To.Value.Second)
+                    x => (x.EmpId == input.EmployeeId) && (x.TransDate.Value >= input.From.Value &&
+                    x.TransDate.Value <= input.To.Value)
                     ).ToListAsync();
 
                 if (transactions.Count == 0)

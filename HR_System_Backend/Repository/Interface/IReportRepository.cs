@@ -8,7 +8,7 @@ namespace HR_System_Backend.Repository.Interface
     {
          Task<Response<AttendLeaveReportResponse>> AttendAndLeaveReport(AttendLeaveReportInput input);
         Task<Response<ProductivitySalaryReportResponse>> ProductivitySalaryReport(ProductivitySalaryInput input);
-
+        Task<Response<SalaryReportResponse>> HoursAndProductivitySalary(ProductivitySalaryInput input);
 
     }
 }

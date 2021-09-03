@@ -8,6 +8,7 @@ namespace HR_System_Backend.Model.Response
     public class ProductivitySalaryReportResponse
     {
         public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
         public DateTime? From { get; set; }
         public DateTime? To { get; set; }
         public int? ItemsNum { get; set; }

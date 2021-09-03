@@ -12,5 +12,6 @@ namespace HR_System_Backend.Model.Response
         public double? workHours { get; set; }
         public double? late { get; set; }
         public double? overTime { get; set; }
+        public double? leaveEarly { get; set; }
     }
 }
