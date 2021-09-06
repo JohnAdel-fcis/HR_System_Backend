@@ -195,7 +195,7 @@ namespace HR_System_Backend.Model
             modelBuilder.Entity<DebitTransaction>(entity =>
             {
                 entity.HasKey(e => e.TranId)
-                    .HasName("PK__DEBIT_TR__C314C336E6AAA33D");
+                    .HasName("PK__DEBIT_TR__C314C336EFAA1835");
 
                 entity.ToTable("DEBIT_TRANSACTIONS");
 
@@ -240,7 +240,8 @@ namespace HR_System_Backend.Model
                 entity.HasOne(d => d.Debit)
                     .WithMany(p => p.DebitTransactions)
                     .HasForeignKey(d => d.DebitId)
-                    .HasConstraintName("FK__DEBIT_TRA__DEBIT__5E8A0973");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__DEBIT_TRA__DEBIT__68D28DBC");
             });
 
             modelBuilder.Entity<Department>(entity =>

@@ -243,24 +243,72 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                var emp = await _context.Employees.Include(s => s.WorkDay).Include(s => s.Holiday).Include(s => s.Documents).Include(x => x.Device).Where(x => x.Id == id).FirstOrDefaultAsync();
+                var emp = await _context.Employees
+                    .Include(s => s.WorkDay)
+                    .Include(s => s.Holiday)
+                    .Include(s => s.Documents)
+                    .Include(x => x.Device)
+                    .Include(x => x.FingerLogs)
+                    .Include(x => x.WorkTimes)
+                    .Include(x => x.Covenants)
+                    .Include(x => x.BounseDiscounts)
+                    .Include(x => x.Debits)
+                    .Include(x => x.ItemTransactions)
+                    .Include(x => x.Items)
+                    .Where(x => x.Id == id)
+                    .FirstOrDefaultAsync();
                 if (emp == null)
                 {
                     response.status = false;
                     response.message = "الموظف غير موجود";
                     return response;
                 }
-                var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), emp.Device);
-                if (!deleteFromDeviceResponse.status)
+                if (emp.Device != null)
                 {
-                    response.status = false;
-                    response.message = deleteFromDeviceResponse.message;
-                    return response;
+                    var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), emp.Device);
+                    if (!deleteFromDeviceResponse.status)
+                    {
+                        response.status = false;
+                        response.message = deleteFromDeviceResponse.message;
+                        return response;
+                    }
                 }
 
 
-                //_context.Employees.Remove(emp);
-                emp.Deleted = true;
+                //var fingerLogs = await _context.FingerLogs.Where(x => x.EmpId == emp.Id).ToListAsync();
+                _context.FingerLogs.RemoveRange(emp.FingerLogs);
+                await _context.SaveChangesAsync();
+
+                //var documents = await _context.Documents.Where(x => x.EmployeeId == emp.Id).ToListAsync();
+                _context.Documents.RemoveRange(emp.Documents);
+                await _context.SaveChangesAsync();
+
+                //var workTimes = await _context.WorkTimes.Where(x => x.EmployeeId == emp.Id).ToListAsync();
+                _context.WorkTimes.RemoveRange(emp.WorkTimes);
+                await _context.SaveChangesAsync();
+
+                //var covenant = await _context.Covenants.Where(x => x.EmplyeeId == emp.Id).ToListAsync();
+                _context.Covenants.RemoveRange(emp.Covenants);
+                await _context.SaveChangesAsync();
+
+                //var bounsAndDescounts = await _context.BounseDiscounts.Where(x => x.EmployeeId == emp.Id).ToListAsync();
+                _context.BounseDiscounts.RemoveRange(emp.BounseDiscounts);
+                await _context.SaveChangesAsync();
+
+                //var debits = await _context.Debits.Where(x => x.EmployeeId == emp.Id).ToListAsync();
+                _context.Debits.RemoveRange(emp.Debits);
+                await _context.SaveChangesAsync();
+
+                _context.ItemTransactions.RemoveRange(emp.ItemTransactions);
+                await _context.SaveChangesAsync();
+
+                _context.Items.RemoveRange(emp.Items);
+                await _context.SaveChangesAsync();
+
+
+
+
+                _context.Employees.Remove(emp);
                 await _context.SaveChangesAsync();
 
 
@@ -269,7 +317,11 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     Directory.Delete("documents/" + id.ToString(), true);
                 }
-
+                var photoExist = Directory.Exists("Photos/" + id.ToString());
+                if (photoExist)
+                {
+                    Directory.Delete("Photos/" + id.ToString(), true);
+                }
 
 
 
@@ -436,6 +488,30 @@ namespace HR_System_Backend.Repository.Repository
 
                 }
 
+
+
+
+                //Edit emp photo
+                var photoExist = Directory.Exists("Photos/" + emp.id.ToString());
+                if (photoExist)
+                {
+                    Directory.Delete("Photos/" + emp.id.ToString(), true);
+                }
+                employee.ProfilePicPath = null;
+                await _context.SaveChangesAsync();
+                if (emp.empPhoto != null)
+                {
+                    var path = SaveEmpPhoto(emp.empPhoto, emp.id);
+                    employee.ProfilePicPath = path;
+                    await _context.SaveChangesAsync();
+                }
+
+
+
+
+
+
+
                 response.status = true;
                 response.message = "تم تعديل الموظف بنجاح";
                 response.data.Add(emp);
@@ -527,12 +603,26 @@ namespace HR_System_Backend.Repository.Repository
                     }
                 }).ToListAsync();
 
+                
                 if (emplyees.Count == 0)
                 {
                     response.status = true;
                     response.message = "لا يوجد بيانات";
                     return response;
                 }
+
+                foreach (var employee in emplyees)
+                {
+                    var photoPath = _context.Employees.Where(e => e.Id == employee.id).FirstOrDefault()?.ProfilePicPath;
+                    if (photoPath != null)
+                    {
+                        List<string> PhotoPaths = new List<string>();
+                        PhotoPaths.Add(photoPath);
+                        employee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                    }
+                }
+
+
                 response.status = true;
                 response.message = "تم سحب البيانات بنجاح";
                 response.data = emplyees;
@@ -601,11 +691,11 @@ namespace HR_System_Backend.Repository.Repository
                                                 Friday = x.WorkDay.Friday
                                             },
                                             deviceId = x.DeviceId,
-                                            items = x.Items.Select(x => new ItemResponse { ItemId = x.ItemId, ItemName = x.ItemName, ItemPrice = x.ItemPrice, ItemCommission = x.ItemCommission }).ToList(),
+                                            items = x.Items.Select(x => new ItemResponse { ItemId = x.ItemId, ItemName = x.ItemName, ItemPrice = x.ItemPrice, ItemCommission = x.ItemCommission, ItemQnty = x.ItemQnty }).ToList(),
                                             roleId = x.RoleId,
                                             password = x.Password,
                                             productivity = x.Productivity.Value
-                                          
+
                                         }).FirstOrDefaultAsync();
 
 
@@ -631,7 +721,7 @@ namespace HR_System_Backend.Repository.Repository
                     PhotoPaths.Add(photoPath);
                     emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
                 }
-               
+
 
 
                 response.status = true;
@@ -982,15 +1072,15 @@ namespace HR_System_Backend.Repository.Repository
 
                 file.CopyTo(fileStream);
             }
-            paths= path;
+            paths = path;
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             return paths;
         }
-       
-        
-        
-        
+
+
+
+
         private List<Image> ReadDocuments(List<string> paths)
         {
             var images = new List<Image>();
