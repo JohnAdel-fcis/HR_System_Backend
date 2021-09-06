@@ -39,7 +39,7 @@ namespace HR_System_Backend.Repository.Repository
                 //Get The best code
                 var codes = await _context.Employees.Where(s => s.DeviceId == input.deviceId).Select(x => x.Code).ToListAsync();
                 codes.Sort();
-                int newCode = 1;
+                int? newCode = 1;
                 foreach (var code in codes)
                 {
                     if (code != newCode)
@@ -59,7 +59,7 @@ namespace HR_System_Backend.Repository.Repository
                     //Save The Employe To FingerPrint Device
                     var device = _context.Devices.Where(x => x.DeviceId == input.deviceId).FirstOrDefault();
                     var fingerRepo = new FingerRepository(_context);
-                    var saveUserResponse = fingerRepo.SetUserFinger(newCode, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
+                    var saveUserResponse = fingerRepo.SetUserFinger(newCode.Value, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
                     if (saveUserResponse.status == false)
                     {
                         response.status = false;
@@ -68,12 +68,16 @@ namespace HR_System_Backend.Repository.Repository
                     }
                     //////////////////////////////////////////
                 }
+                else
+                {
+                    newCode = null;
+                }
 
                 if (input.salaryId == 0)
                 {
                     input.salaryId = null;
                 }
-                
+
 
 
 
@@ -145,10 +149,10 @@ namespace HR_System_Backend.Repository.Repository
                     RoleId = input.roleId,
                     Productivity = input.productivity,
                     Password = input.password,
-                    MedicalInsurancePercentage=input.medicalInsurancePercentage,
-                    SocialInsurancePercentage=input.socialInsurancePercentage,
-                    MedicalInsurance=input.medicalInsurance,
-                    SocialInsurance=input.socialInsurance
+                    MedicalInsurancePercentage = input.medicalInsurancePercentage,
+                    SocialInsurancePercentage = input.socialInsurancePercentage,
+                    MedicalInsurance = input.medicalInsurance,
+                    SocialInsurance = input.socialInsurance
 
                 };
                 // Check if employe poductivity
@@ -191,7 +195,12 @@ namespace HR_System_Backend.Repository.Repository
                     }
 
                 }
-
+                if (input.empPhoto != null)
+                {
+                    var path = SaveEmpPhoto(input.empPhoto, employee.Id);
+                    employee.ProfilePicPath = path;
+                    await _context.SaveChangesAsync();
+                }
 
                 var employeeResponse = new EmployeeResponse
                 {
@@ -250,7 +259,8 @@ namespace HR_System_Backend.Repository.Repository
                 }
 
 
-                _context.Employees.Remove(emp);
+                //_context.Employees.Remove(emp);
+                emp.Deleted = true;
                 await _context.SaveChangesAsync();
 
 
@@ -376,10 +386,10 @@ namespace HR_System_Backend.Repository.Repository
                                 });
                             }
                             else
-                            { 
-                            itm.ItemName = item.ItemName;
-                            itm.ItemPrice = item.ItemPrice;
-                            itm.ItemCommission = item.ItemCommission;
+                            {
+                                itm.ItemName = item.ItemName;
+                                itm.ItemPrice = item.ItemPrice;
+                                itm.ItemCommission = item.ItemCommission;
                             }
 
                         }
@@ -397,11 +407,11 @@ namespace HR_System_Backend.Repository.Repository
                     Directory.Delete("documents/" + emp.id.ToString(), true);
                 }
                 var doc = _context.Documents.Where(x => x.EmployeeId == emp.id).ToList();
-                if (doc.Count>0)
+                if (doc.Count > 0)
                 {
-                      _context.Documents.RemoveRange(doc);
+                    _context.Documents.RemoveRange(doc);
                 }
-              
+
                 await _context.SaveChangesAsync();
                 ////////////////////////////////////
 
@@ -569,7 +579,7 @@ namespace HR_System_Backend.Repository.Repository
                                             baseTime = x.BaseTime,
                                             createdDate = x.CreateDate,
                                             departmentId = x.DepartmentId,
-                                            code=x.Code,
+                                            code = x.Code,
                                             holiday = new Week
                                             {
                                                 Saturday = x.Holiday.Saturday,
@@ -595,6 +605,7 @@ namespace HR_System_Backend.Repository.Repository
                                             roleId = x.RoleId,
                                             password = x.Password,
                                             productivity = x.Productivity.Value
+                                          
                                         }).FirstOrDefaultAsync();
 
 
@@ -611,6 +622,16 @@ namespace HR_System_Backend.Repository.Repository
                 var imagesBase64 = ReadDocuments(paths);
                 emplyee.documents = imagesBase64;
 
+
+
+                var photoPath = _context.Employees.Where(e => e.Id == id).FirstOrDefault()?.ProfilePicPath;
+                if (photoPath != null)
+                {
+                    List<string> PhotoPaths = new List<string>();
+                    PhotoPaths.Add(photoPath);
+                    emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                }
+               
 
 
                 response.status = true;
@@ -653,7 +674,7 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
-      
+
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeInput emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -692,33 +713,33 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             if (emp.socialInsurancePercentage != null)
             {
-                if(emp.socialInsurancePercentage.Value)
+                if (emp.socialInsurancePercentage.Value)
                 {
-                    if (emp.socialInsurance.Value >100)
+                    if (emp.socialInsurance.Value > 100)
                     {
-                        response.status =false ;
+                        response.status = false;
                         response.message = "يجب ان لا تتعدى نسبه التامين 100% من المرتب";
-                        return response ;
+                        return response;
                     }
                 }
-                
+
             }
 
-               ///////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////
             //check if social precentage
             ///////////////////////////////////////////////////////////////////////////
             if (emp.medicalInsurancePercentage != null)
             {
-                if(emp.medicalInsurancePercentage.Value)
+                if (emp.medicalInsurancePercentage.Value)
                 {
-                    if (emp.medicalInsurance.Value >100)
+                    if (emp.medicalInsurance.Value > 100)
                     {
-                        response.status =false ;
+                        response.status = false;
                         response.message = "يجب ان لا تتعدى نسبه التامين 100% من المرتب";
-                        return response ;
+                        return response;
                     }
                 }
-                
+
             }
 
 
@@ -783,7 +804,7 @@ namespace HR_System_Backend.Repository.Repository
             return response;
 
         }
-       
+
         private async Task<Response<EmployeeResponse>> ValidateEmployee(HR_DBContext db, EmployeeResponse emp)
         {
             var response = new Response<EmployeeResponse>();
@@ -858,9 +879,10 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-        private List<string> SaveDocuments(List<string> documents, int empId)
+        private List<string> SaveDocuments(List<Image> documents, int empId)
         {
             List<string> paths = new List<string>();
+
             foreach (var item in documents)
             {
 
@@ -877,17 +899,32 @@ namespace HR_System_Backend.Repository.Repository
 
 
                 //////////////////////////*Generate id for each image*////////////////////////////////////////
-                string newImageId;
-                newImageId = Guid.NewGuid().ToString();
-                path = path + "/" + newImageId + ".jpg";
+                //string newImageId;
+                //newImageId = Guid.NewGuid().ToString();
+                //path = path + "/" + newImageId + ".jpg";
                 ////////////////////////////////////////////////////////////////////////////////////////////////
+
+                path = path + "/" + item.name;
+
+                if (File.Exists(path))
+                {
+                    continue;
+                }
+
+
+
+
+
+
+
+
 
 
 
                 /////////////////////////////////////////*** Convert base64 to image and save it ***//////////////////////////////////////
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
-                    byte[] bytes = Convert.FromBase64String(item);
+                    byte[] bytes = Convert.FromBase64String(item.base64);
                     MemoryStream stream = new MemoryStream(bytes);
                     ImageConverter v = new ImageConverter();
 
@@ -902,14 +939,67 @@ namespace HR_System_Backend.Repository.Repository
             return paths;
         }
 
-        private List<string> ReadDocuments(List<string> paths)
+
+        private string SaveEmpPhoto(Image photo, int empId)
         {
-            var images = new List<string>();
+            string paths;
+
+            /////////////////// create Folder For each employee ///////////////////////////////////////////////////////////////////////
+            string path = @"Photos/" + empId.ToString();
+
+
+            // Create directory temp1 if it doesn't exist
+            Directory.CreateDirectory(path);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+            //////////////////////////*Generate id for each image*////////////////////////////////////////
+            //string newImageId;
+            //newImageId = Guid.NewGuid().ToString();
+            //path = path + "/" + newImageId + ".jpg";
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+
+            path = path + "/" + photo.name;
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+
+            /////////////////////////////////////////*** Convert base64 to image and save it ***//////////////////////////////////////
+            using (var fileStream = new FileStream(path, FileMode.Create))
+            {
+                byte[] bytes = Convert.FromBase64String(photo.base64);
+                MemoryStream stream = new MemoryStream(bytes);
+                ImageConverter v = new ImageConverter();
+
+                //IFormFile file = new FormFile(stream, 0, bytes.Length, eqp.Name, eqp.Name);
+                IFormFile file = new FormFile(stream, 0, bytes.Length, "fileName", "fileName");
+
+                file.CopyTo(fileStream);
+            }
+            paths= path;
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            return paths;
+        }
+       
+        
+        
+        
+        private List<Image> ReadDocuments(List<string> paths)
+        {
+            var images = new List<Image>();
             foreach (var path in paths)
             {
                 byte[] imageArray = System.IO.File.ReadAllBytes(path);
+                var name = Path.GetFileName(path);
                 var image = Convert.ToBase64String(imageArray);
-                images.Add(image);
+                images.Add(new Image { base64 = image, name = name });
             }
             return images;
         }

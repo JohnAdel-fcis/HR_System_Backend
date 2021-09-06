@@ -24,7 +24,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<OverTimeResponse>();
             try
             {
-                var employee = await _context.Employees.Include(x=>x.Holiday).Include(X => X.SalaryType).Include(x=>x.WorkTimes).Where(x => x.Id == input.empId).FirstOrDefaultAsync();
+                var employee = await _context.Employees.Include(x => x.Holiday).Include(X => X.SalaryType).Include(x => x.WorkTimes).Where(x => x.Id == input.empId).FirstOrDefaultAsync();
                 if (employee == null)
                 {
                     response.status = false;
@@ -42,7 +42,7 @@ namespace HR_System_Backend.Repository.Repository
                     }
                     if (!employee.Productivity.Value && employee.SalaryType == null)
                     {
-                         response.status = false;
+                        response.status = false;
                         response.message = "يجب ادخال نوع الراتب للموظف بنظام الساعات";
                         return response;
                     }
@@ -198,28 +198,21 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "هذه الورديه غير موجودة";
                     return response;
                 }
-                /* if (shift.dateTo.Value.Subtract(shift.dateFrom.Value).Days <= 0)
-                {
-                    response.status = false;
-                    response.message = "يجب ان يكون تاريخ الانتهاء اكبر من تاريخ البداية";
-                    return response;
-                } */
+                var timeFrom = TimeSpan.Parse(shift.timeFrom);
+                var timeTo = TimeSpan.Parse(shift.timeTo);
+                var shiftHours = Convert.ToDouble(string.Format("{0:0.0}", timeTo.Subtract(timeFrom).TotalHours));
 
 
 
-                var shftEdited = new Shift
-                {
-                    ShiftName = shift.shiftName,
-                    DateFrom = shift.dateFrom,
-                    DateTo = shift.dateTo,
-                    TimeFrom = TimeSpan.Parse(shift.timeFrom),
-                    TimeTo = TimeSpan.Parse(shift.timeTo),
-                    AllowCome = shift.allowCome,
-                    AllowLeave = shift.allowLeave
-                };
 
-                _context.Entry(shft).State = EntityState.Detached;
-                _context.Entry(shftEdited).State = EntityState.Modified;
+                shft.ShiftName = shift.shiftName;
+                shft.DateFrom = shift.dateFrom;
+                shft.DateTo = shift.dateTo;
+                shft.TimeFrom = timeFrom;
+                shft.TimeTo = timeTo;
+                shft.AllowCome = shift.allowCome;
+                shft.AllowLeave = shift.allowLeave;
+                shft.ShiftHour = shiftHours;
                 await _context.SaveChangesAsync();
 
 
@@ -234,7 +227,8 @@ namespace HR_System_Backend.Repository.Repository
                     timeFrom = shft.TimeFrom.Value.ToString(@"hh\:mm"),
                     timeTo = shft.TimeTo.Value.ToString(@"hh\:mm"),
                     allowCome = shift.allowCome,
-                    allowLeave = shift.allowLeave
+                    allowLeave = shift.allowLeave,
+                    shiftHour = shiftHours
                 });
 
                 return response;
@@ -335,7 +329,7 @@ namespace HR_System_Backend.Repository.Repository
                     continue;
                 }
                 var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                
+
                 if (type == typeof(bool))
                 {
                     if (!(bool)prop.GetValue(holiday, null))

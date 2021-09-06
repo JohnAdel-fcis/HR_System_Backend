@@ -435,7 +435,7 @@ namespace HR_System_Backend.Repository.Repository
                             idwVerifyMode = idwVerifyMode,
                             idwInOutMode = idwInOutMode,
                             LogDate = new DateTime(idwYear, idwMonth, idwDay).Date,
-                            LogTime = new TimeSpan(idwHour, idwMinute, idwSecond).ToString(@"hh:mm"),
+                            LogTime = new TimeSpan(idwHour, idwMinute, idwSecond).ToString(@"hh\:mm"),
                             name = name
                         });
                     }

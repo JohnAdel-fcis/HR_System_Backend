@@ -39,9 +39,9 @@ namespace HR_System_Backend.Model.Input
         public int? shiftId { get; set; }
         public Week holiday { get; set; }
         //public Week workDays { get; set; }
-        public List<string> documents { get; set; }
+        public List<Image> documents { get; set; }
         public int? roleId { get; set; }
-        [Required]
+        //[Required]
         public int? deviceId { get; set; }
         public string password { get; set; }
         public bool productivity { get; set; }
@@ -50,5 +50,6 @@ namespace HR_System_Backend.Model.Input
         public bool? socialInsurancePercentage { get; set; }
         public decimal? socialInsurance { get; set; }
         public decimal? medicalInsurance { get; set; }
+        public Image empPhoto { get; set; }
     }
 }

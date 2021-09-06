@@ -28,12 +28,13 @@ namespace HR_System_Backend.Model.Response
         public int? shiftId { get; set; }
         public Week holiday { get; set; }
         public Week workDays { get; set; }
-        public List<string> documents { get; set; }
+        public List<Image> documents { get; set; }
         public int? roleId { get; set; }
         public int? deviceId { get; set; }
         public string password { get; set; }
         public bool productivity { get; set; }
         public List<ItemResponse> items { get; set; }
         public int? code { get; set; }
+        public Image empPhoto { get; set; }
     }
 }

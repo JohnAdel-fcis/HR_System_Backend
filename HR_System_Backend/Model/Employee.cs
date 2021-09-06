@@ -45,6 +45,8 @@ namespace HR_System_Backend.Model
         public decimal? SocialInsurance { get; set; }
         public bool? SocialInsurancePercentage { get; set; }
         public bool? MedicalInsurancePercentage { get; set; }
+        public string ProfilePicPath { get; set; }
+        public bool? Deleted { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual Department Department { get; set; }
