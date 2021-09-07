@@ -11,7 +11,7 @@ namespace HR_System_Backend.Model.Input
         public EmployeeInput()
         {
 
-            addToDevice = true;
+            addToDevice = false;
             productivity = false;
             items = new List<ItemInput>();
             timeIn = "00:00";

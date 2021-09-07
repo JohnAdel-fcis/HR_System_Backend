@@ -54,7 +54,7 @@ namespace HR_System_Backend.Repository.Repository
 
 
 
-                if (input.addToDevice)
+                if (input.addToDevice || (input.deviceId==0 && input.deviceId==null))
                 {
                     //Save The Employe To FingerPrint Device
                     var device = _context.Devices.Where(x => x.DeviceId == input.deviceId).FirstOrDefault();
@@ -70,6 +70,7 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 else
                 {
+                    input.deviceId = null;
                     newCode = null;
                 }
 
@@ -783,7 +784,7 @@ namespace HR_System_Backend.Repository.Repository
             //check if  finger Device is existing
             ///////////////////////////////////////////////////////////////////////////
             ///
-            if (emp.addToDevice)
+            if (emp.addToDevice || (emp.deviceId != 0  && emp.deviceId !=null))
             {
                 var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
                 if (device == null)
@@ -912,6 +913,11 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
             ///////////////////////////////////////////////////////////////////////////
+            if (emp.departmentId ==0)
+            {
+                emp.departmentId = null;
+            }
+
             if (emp.departmentId != null)
             {
                 var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
@@ -924,7 +930,10 @@ namespace HR_System_Backend.Repository.Repository
             }
 
 
-
+            if (emp.categoryId == 0)
+            {
+                emp.categoryId = null;
+            }
             ///////////////////////////////////////////////////////////////////////////
             //check if category is existing
             ///////////////////////////////////////////////////////////////////////////
@@ -962,6 +971,11 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if shift is existing
             ///////////////////////////////////////////////////////////////////////////
+
+            if (emp.shiftId == 0)
+            {
+                emp.shiftId = null;
+            }
             if (emp.shiftId != null)
             {
                 var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();

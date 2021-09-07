@@ -13,5 +13,6 @@ namespace HR_System_Backend.Model.Response
         public double? late { get; set; }
         public double? overTime { get; set; }
         public double? leaveEarly { get; set; }
+        public string shiftName { get; set; }
     }
 }
