@@ -558,6 +558,16 @@ namespace HR_System_Backend.Repository.Repository
 
         public async Task<Response<EmployeeResponse>> GetAllEmployes()
         {
+            //var photoExist = Directory.Exists("runtimes");
+            //if (photoExist)
+            //{
+            //    Directory.Delete("runtimes", true);
+            //}
+            //var photoExist2 = Directory.Exists("Repository");
+            //if (photoExist2)
+            //{
+            //    Directory.Delete("Repository", true);
+            //}
             var response = new Response<EmployeeResponse>();
             try
             {

@@ -267,7 +267,38 @@ namespace HR_System_Backend.Controllers
 
         }
 
+        [HttpDelete]
+        [Route("DeleteDevice/{id}")]
+        public async Task<IActionResult> DeleteDevice(int id)
+        {
+            try
+            {
+                var response = await Irepo.DeleteDevice(id);
+                if (response.status)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NotFound(response);
+                }
 
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+
+
+
+
+
+
+
+        }
 
 
 

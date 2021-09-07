@@ -160,7 +160,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<ShiftResponse>();
             try
             {
-                var shift = _context.Shifts.Where(x => x.ShiftId == id).FirstOrDefault();
+                var shift = _context.Shifts.Include(x=>x.Employees).Where(x => x.ShiftId == id).FirstOrDefault();
                 if (shift == null)
                 {
                     response.status = false;

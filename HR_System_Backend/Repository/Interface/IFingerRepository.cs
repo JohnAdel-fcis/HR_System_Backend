@@ -20,6 +20,7 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<DeviceResponse>> AddDevice(DeviceInput input);
         Task<Response<DeviceResponse>> EditDevice(DeviceResponse input);
         Task<Response<DeviceResponse>> GetDeviceByid(int id);
+        Task<Response<DeviceResponse>> DeleteDevice(int id);
 
     }
 }

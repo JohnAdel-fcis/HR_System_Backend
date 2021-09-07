@@ -663,5 +663,42 @@ namespace HR_System_Backend.Repository.Repository
             }
 
         }
+    
+        public async Task<Response<DeviceResponse>> DeleteDevice(int id)
+        {
+            var response = new Response<DeviceResponse>();
+            try
+            {
+                var device = await _context.Devices.Where(x => x.DeviceId == id).FirstOrDefaultAsync();
+                if (device == null)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد هذا الجهاز";
+                    return response;
+                }
+
+                var employee = _context.Employees.Where(x => x.DeviceId == id).FirstOrDefault();
+                if (employee!= null)
+                {
+                    response.status = false;
+                    response.message = "يوجد موظفين مسجلين برقم الجهاز يرجي تغيرهم اولا";
+                    return response;
+                }
+                _context.Devices.Remove(device);
+                await _context.SaveChangesAsync();
+                response.status = true;
+                response.message = "تم مسح الجهاز بنجاح";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.status = false;
+                response.message = "حدث خطأ " + ex.Message ;
+                return response;
+            }
+        }
+    
+    
+    
     }
 }
