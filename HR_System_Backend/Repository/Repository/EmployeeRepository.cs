@@ -559,17 +559,8 @@ namespace HR_System_Backend.Repository.Repository
         }
 
         public async Task<Response<EmployeeResponse>> GetAllEmployes()
+
         {
-            //var photoExist = Directory.Exists("runtimes");
-            //if (photoExist)
-            //{
-            //    Directory.Delete("runtimes", true);
-            //}
-            //var photoExist2 = Directory.Exists("Repository");
-            //if (photoExist2)
-            //{
-            //    Directory.Delete("Repository", true);
-            //}
             var response = new Response<EmployeeResponse>();
             try
             {
@@ -615,14 +606,14 @@ namespace HR_System_Backend.Repository.Repository
                     }
                 }).ToListAsync();
 
-                
+                var em = new EmployeeResponseReport();
                 if (emplyees.Count == 0)
                 {
                     response.status = true;
                     response.message = "لا يوجد بيانات";
                     return response;
                 }
-
+                
                 foreach (var employee in emplyees)
                 {
                     var photoPath = _context.Employees.Where(e => e.Id == employee.id).FirstOrDefault()?.ProfilePicPath;
@@ -634,7 +625,7 @@ namespace HR_System_Backend.Repository.Repository
                     }
                 }
 
-
+                var result =em.IsToday();
                 response.status = true;
                 response.message = "تم سحب البيانات بنجاح";
                 response.data = emplyees;
@@ -723,6 +714,8 @@ namespace HR_System_Backend.Repository.Repository
                 var paths = documentsPaths.ToList();
                 var imagesBase64 = ReadDocuments(paths);
                 emplyee.documents = imagesBase64;
+                var em = new EmployeeResponseReport();
+                em.IsToday();
 
 
 
