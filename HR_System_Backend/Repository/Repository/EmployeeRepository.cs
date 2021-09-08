@@ -444,6 +444,7 @@ namespace HR_System_Backend.Repository.Repository
                                 itm.ItemPrice = item.ItemPrice;
                                 itm.ItemCommission = item.ItemCommission;
                             }
+                            await _context.SaveChangesAsync();
 
                         }
                     }

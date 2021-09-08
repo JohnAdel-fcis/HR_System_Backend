@@ -31,6 +31,7 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "الموظف غير موجود او ليس في قسم الانتاجية";
                     return response;
                 }
+                
 
                 foreach (var selectedTransaction in input.Transactions)
                 {
@@ -47,7 +48,12 @@ namespace HR_System_Backend.Repository.Repository
                     }
 
                     var commisionPerUnit = item.ItemPrice / item.ItemQnty;
-
+                    if (selectedTransaction.Date == null)
+                    {
+                        response.status = false;
+                        response.message = "يجب ادخال تواريخ الحركات";
+                        return response;
+                    }
 
                     var transaction = new ItemTransaction
                     {
