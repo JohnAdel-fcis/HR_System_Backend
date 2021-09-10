@@ -1047,7 +1047,6 @@ namespace HR_System_Backend.Repository.Repository
             return paths;
         }
 
-
         private string SaveEmpPhoto(Image photo, int empId)
         {
             string paths;
@@ -1095,9 +1094,6 @@ namespace HR_System_Backend.Repository.Repository
 
             return paths;
         }
-
-
-
 
         private List<Image> ReadDocuments(List<string> paths)
         {

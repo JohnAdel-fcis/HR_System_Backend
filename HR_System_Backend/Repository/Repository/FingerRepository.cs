@@ -274,8 +274,8 @@ namespace HR_System_Backend.Repository.Repository
 
             var response = new Response<EmpInfoFinger>();
             var axCZKEM1 = new zkemkeeper.CZKEM();
-
-
+            
+            
 
             bool bIsConnected = false;
             int iMachineNumber = 1;
@@ -323,7 +323,7 @@ namespace HR_System_Backend.Repository.Repository
                     while (axCZKEM1.SSR_GetGeneralLogData(iMachineNumber, out sdwEnrollNumber, out idwVerifyMode,
                            out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))//get records from the memory
                     {
-                        var name = emps.Where(s => s.Code == Int32.Parse(sdwEnrollNumber)).FirstOrDefault().Name;
+                        var name = emps.Where(s => s.Code == Int32.Parse(sdwEnrollNumber)).FirstOrDefault()?.Name;
                         userList.Add(new EmpInfoFinger
                         {
                             idwEnrollNumber = Int32.Parse(sdwEnrollNumber),
@@ -335,6 +335,7 @@ namespace HR_System_Backend.Repository.Repository
                         });
                     }
                     axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
+                    axCZKEM1.Disconnect();
                     response.status = true;
                     response.message = "تم سحب حضور الموظفين من جهاز البصمة بنجاح";
                     response.data = userList;
@@ -347,6 +348,7 @@ namespace HR_System_Backend.Repository.Repository
                     if (idwErrorCode != 0)
                     {
                         axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
+                        axCZKEM1.Disconnect();
                         response.status = false;
                         response.message = "حدث خطا في قراءة البيانات من الجهاز" + idwErrorCode.ToString() + " Error";
                         return response;
@@ -354,6 +356,7 @@ namespace HR_System_Backend.Repository.Repository
                     else
                     {
                         axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
+                        axCZKEM1.Disconnect();
                         response.status = false;
                         response.message = "لا يوجد بيانات في الجهاز";
                         return response;
@@ -363,6 +366,7 @@ namespace HR_System_Backend.Repository.Repository
             catch (Exception ex)
             {
                 axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
+                axCZKEM1.Disconnect();
                 response.status = false;
                 response.message = "   حدث خطأ  " + ex.Message;
                 return response;
@@ -420,7 +424,9 @@ namespace HR_System_Backend.Repository.Repository
 
                     });
                 }
+                
                 axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
+                axCZKEM1.Disconnect();
                 if (userList.Count > 0)
                 {
                     response.status = true;
@@ -437,6 +443,7 @@ namespace HR_System_Backend.Repository.Repository
             }
             catch (Exception ex)
             {
+                axCZKEM1.Disconnect();
                 response.status = false;
                 response.message = ex.Message;
                 return response;
