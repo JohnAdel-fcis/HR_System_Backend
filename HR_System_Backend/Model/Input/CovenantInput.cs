@@ -10,6 +10,6 @@ namespace HR_System_Backend.Model.Input
         public string CovenantName { get; set; }
         public DateTime? CovenantFromDate { get; set; }
         public DateTime? CovenantToDate { get; set; }
-        public int? EmplyeeId { get; set; }
+        public int? EmployeeId { get; set; }
     }
 }

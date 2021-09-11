@@ -266,9 +266,6 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-
-
-
         private Response<EmpInfoFinger> GetLogs(FingerGetAllInput input)
         {
 
@@ -498,10 +495,10 @@ namespace HR_System_Backend.Repository.Repository
                 response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId, deviceName = newDevice.DeviceName });
                 return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 response.status = false;
-                response.message = "حدث خطأ";
+                response.message = ex.Message;
                 return response;
             }
         }

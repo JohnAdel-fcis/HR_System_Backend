@@ -212,7 +212,7 @@ namespace HR_System_Backend.Repository.Repository
                     if (productivityEmployees.Count == 0)
                     {
                         response.status = false;
-                        response.message = "لا يوجد عمال انتاجية";
+                        response.message = " لا يوجد عمال انتاجية";
                         return response;
                     }
                     foreach (var employee in productivityEmployees)
@@ -252,7 +252,7 @@ namespace HR_System_Backend.Repository.Repository
                     if (employee == null)
                     {
                         response.status = false;
-                        response.message = "العامل غير موجود بالانتاجية";
+                        response.message = "العامل غير موجود بالانتاجية او موجود بقسم الساعات و الانتاجيه معا";
                         return response;
                     }
                     int? numOfItems = 0;
@@ -293,7 +293,6 @@ namespace HR_System_Backend.Repository.Repository
                 return response;
             }
         }
-
         public async Task<Response<SalaryReportResponse>> HoursAndProductivitySalary(ProductivitySalaryInput input)
         {
             var response = new Response<SalaryReportResponse>();

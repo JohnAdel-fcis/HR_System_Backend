@@ -619,9 +619,12 @@ namespace HR_System_Backend.Repository.Repository
                     var photoPath = _context.Employees.Where(e => e.Id == employee.id).FirstOrDefault()?.ProfilePicPath;
                     if (photoPath != null)
                     {
-                        List<string> PhotoPaths = new List<string>();
-                        PhotoPaths.Add(photoPath);
-                        employee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                       
+                            List<string> PhotoPaths = new List<string>();
+                            PhotoPaths.Add(photoPath);
+                            employee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                        
+                        
                     }
                 }
 
@@ -634,7 +637,7 @@ namespace HR_System_Backend.Repository.Repository
             }
             catch (Exception ex)
             {
-                response.status = true;
+                response.status = false;
                 response.message = ex.Message;
                 return response;
             }
@@ -652,6 +655,7 @@ namespace HR_System_Backend.Repository.Repository
                                         .Include(x => x.WorkDay)
                                         .Include(x => x.Items)
                                         .Include(x => x.Documents)
+                                        .Include(x=>x.Device)
                                         .Where(e => e.Id == id)
                                         .Select(x => new EmployeeResponse
                                         {
@@ -722,9 +726,14 @@ namespace HR_System_Backend.Repository.Repository
                 var photoPath = _context.Employees.Where(e => e.Id == id).FirstOrDefault()?.ProfilePicPath;
                 if (photoPath != null)
                 {
-                    List<string> PhotoPaths = new List<string>();
-                    PhotoPaths.Add(photoPath);
-                    emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                    
+                        List<string> PhotoPaths = new List<string>();
+                        PhotoPaths.Add(photoPath);
+                        emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
+                    
+                    //List<string> PhotoPaths = new List<string>();
+                    //PhotoPaths.Add(photoPath);
+                    //emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
                 }
 
 
