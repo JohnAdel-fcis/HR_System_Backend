@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "YzC/trTVKpzN8jOnsA6dLPjd4wyNgFN51r0MFdagbQ17HC00qM/WgIA42ckRmpBTFlEBiVCXFF+YUZXTHaxJDw==",
+  "dgSpecHash": "tSFKFjKWJwtRRfC2FrAxCIWl4TvgMP3mnE7RWsN1S1wMJOO+K8vCmzzUMwJkAD7eNoeFkYA4oDgzrGueqPdoYA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\John.Adel\\OneDrive - Pharos Securities Brokerage\\Desktop\\HR_System-2021-08-29\\HR_System_Backend\\HR_System_Backend.csproj",
+  "projectFilePath": "C:\\Users\\John.Adel\\OneDrive - Pharos Securities Brokerage\\Desktop\\HR_System\\HR-2021-09-16\\HR_System_Backend\\HR_System_Backend\\HR_System_Backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\John.Adel\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.html.abstractions\\2.2.0\\microsoft.aspnetcore.html.abstractions.2.2.0.nupkg.sha512",
@@ -184,7 +184,7 @@
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512",
     "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\3.1.10\\microsoft.aspnetcore.app.ref.3.1.10.nupkg.sha512",
-    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.12\\microsoft.netcore.app.host.win-x64.3.1.12.nupkg.sha512"
+    "C:\\Users\\John.Adel\\.nuget\\packages\\microsoft.netcore.app.host.win-x86\\3.1.12\\microsoft.netcore.app.host.win-x86.3.1.12.nupkg.sha512"
   ],
   "logs": [
     {
