@@ -29,8 +29,6 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-
-
                 var resp = await ValidateEmployee(_context, input);
                 if (!resp.status)
                     return resp;
@@ -54,18 +52,34 @@ namespace HR_System_Backend.Repository.Repository
 
 
 
-                if (input.addToDevice || (input.deviceId==0 && input.deviceId==null))
+                if (input.addToDevice && input.branchId== null )
                 {
                     //Save The Employe To FingerPrint Device
-                    var device = _context.Devices.Where(x => x.DeviceId == input.deviceId).FirstOrDefault();
+                    string errorResposne = "";
                     var fingerRepo = new FingerRepository(_context);
-                    var saveUserResponse = fingerRepo.SetUserFinger(newCode.Value, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
-                    if (saveUserResponse.status == false)
+                    var devices =  _context.Branches.Include(x => x.Devices).Where(x => x.BranchId == input.branchId).FirstOrDefault()?.Devices.ToList();
+                    foreach (var device in devices)
+                    {
+                        var saveUserResponse = fingerRepo.SetUserFinger(newCode.Value, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
+                        if (saveUserResponse.status == false)
+                        {
+                            errorResposne = errorResposne+"جهاز البصمه باسم" + device.DeviceName + " لا يستجيب يرجى ادخال الموظف يدويا" + System.Environment.NewLine;
+                            continue;
+                        }
+                    }
+                    if (errorResposne == "")
+                    {
+                        response.status = true;
+                        response.message = "تم حفظ البيانات في الاجهزه و النظام بنجاح";
+                        
+                    }
+                    else
                     {
                         response.status = false;
-                        response.message = saveUserResponse.message;
-                        return response;
+                        response.message = errorResposne;
+                       
                     }
+                   
                     //////////////////////////////////////////
                 }
                 else
@@ -153,7 +167,8 @@ namespace HR_System_Backend.Repository.Repository
                     MedicalInsurancePercentage = input.medicalInsurancePercentage,
                     SocialInsurancePercentage = input.socialInsurancePercentage,
                     MedicalInsurance = input.medicalInsurance,
-                    SocialInsurance = input.socialInsurance
+                    SocialInsurance = input.socialInsurance,
+                    BranchId = input.branchId
 
                 };
                 // Check if employe poductivity
@@ -224,8 +239,7 @@ namespace HR_System_Backend.Repository.Repository
                     shiftId = input.shiftId,
                     holiday = input.holiday
                 };
-                response.status = true;
-                response.message = "تمت اضافة الموظف بنجاح";
+                
                 response.data.Add(employeeResponse);
                 return response;
 
@@ -238,7 +252,7 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
-        public async Task<Response<EmployeeResponse>> DeleteEmployee(int id)
+        public async Task<Response<EmployeeResponse>> DeleteEmployee(int id, bool fingerDelete = true)
         {
             var fingerRepo = new FingerRepository(_context);
             var response = new Response<EmployeeResponse>();
@@ -248,7 +262,7 @@ namespace HR_System_Backend.Repository.Repository
                     .Include(s => s.WorkDay)
                     .Include(s => s.Holiday)
                     .Include(s => s.Documents)
-                    .Include(x => x.Device)
+                    .Include(x => x.Branch)
                     .Include(x => x.FingerLogs)
                     .Include(x => x.WorkTimes)
                     .Include(x => x.Covenants)
@@ -264,13 +278,31 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "الموظف غير موجود";
                     return response;
                 }
-                if (emp.Device != null)
+                if (fingerDelete)
                 {
-                    var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), emp.Device);
-                    if (!deleteFromDeviceResponse.status)
+                    string errorResposne = "";
+                    var branch = _context.Branches.Where(x => x.BranchId == emp.BranchId).FirstOrDefault();
+                    if (branch == null)
                     {
                         response.status = false;
-                        response.message = deleteFromDeviceResponse.message;
+                        response.message = "الموظف ليس له فرع لا يمكن الحذف";
+                        return response;
+                    }
+                    foreach (var device in branch.Devices)
+                    {
+                        var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), device);
+                        if (!deleteFromDeviceResponse.status)
+                        {
+                            errorResposne = errorResposne + "جهاز البصمه باسم" + device.DeviceName + " لا يستجيب يرجى حذف الموظف يدويا" + System.Environment.NewLine;
+
+                            
+                        }
+                    }
+
+                    if (errorResposne == "")
+                    {
+                        response.status = false;
+                        response.message = errorResposne;
                         return response;
                     }
                 }
@@ -613,22 +645,22 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "لا يوجد بيانات";
                     return response;
                 }
-                
+
                 foreach (var employee in emplyees)
                 {
                     var photoPath = _context.Employees.Where(e => e.Id == employee.id).FirstOrDefault()?.ProfilePicPath;
                     if (photoPath != null)
                     {
-                       
-                            List<string> PhotoPaths = new List<string>();
-                            PhotoPaths.Add(photoPath);
-                            employee.empPhoto = ReadDocuments(PhotoPaths)[0];
-                        
-                        
+
+                        List<string> PhotoPaths = new List<string>();
+                        PhotoPaths.Add(photoPath);
+                        employee.empPhoto = ReadDocuments(PhotoPaths)[0];
+
+
                     }
                 }
 
-                var result =em.IsToday();
+                var result = em.IsToday();
                 response.status = true;
                 response.message = "تم سحب البيانات بنجاح";
                 response.data = emplyees;
@@ -655,7 +687,7 @@ namespace HR_System_Backend.Repository.Repository
                                         .Include(x => x.WorkDay)
                                         .Include(x => x.Items)
                                         .Include(x => x.Documents)
-                                        .Include(x=>x.Device)
+                                        //.Include(x=>x.Device)
                                         .Where(e => e.Id == id)
                                         .Select(x => new EmployeeResponse
                                         {
@@ -726,11 +758,11 @@ namespace HR_System_Backend.Repository.Repository
                 var photoPath = _context.Employees.Where(e => e.Id == id).FirstOrDefault()?.ProfilePicPath;
                 if (photoPath != null)
                 {
-                    
-                        List<string> PhotoPaths = new List<string>();
-                        PhotoPaths.Add(photoPath);
-                        emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
-                    
+
+                    List<string> PhotoPaths = new List<string>();
+                    PhotoPaths.Add(photoPath);
+                    emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
+
                     //List<string> PhotoPaths = new List<string>();
                     //PhotoPaths.Add(photoPath);
                     //emplyee.empPhoto = ReadDocuments(PhotoPaths)[0];
@@ -787,7 +819,7 @@ namespace HR_System_Backend.Repository.Repository
             //check if  finger Device is existing
             ///////////////////////////////////////////////////////////////////////////
             ///
-            if (emp.addToDevice || (emp.deviceId != 0  && emp.deviceId !=null))
+            if (emp.addToDevice || (emp.deviceId != 0 && emp.deviceId != null))
             {
                 var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
                 if (device == null)
@@ -916,7 +948,7 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
             ///////////////////////////////////////////////////////////////////////////
-            if (emp.departmentId ==0)
+            if (emp.departmentId == 0)
             {
                 emp.departmentId = null;
             }

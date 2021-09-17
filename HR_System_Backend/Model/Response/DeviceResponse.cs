@@ -12,5 +12,6 @@ namespace HR_System_Backend.Model.Response
         public string DevicePort { get; set; }
         public int? Priority { get; set; }
         public string deviceName { get; set; }
+        public int? branchId { get; set; }
     }
 }

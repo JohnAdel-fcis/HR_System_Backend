@@ -51,5 +51,6 @@ namespace HR_System_Backend.Model.Input
         public decimal? socialInsurance { get; set; }
         public decimal? medicalInsurance { get; set; }
         public Image empPhoto { get; set; }
+        public int? branchId { get; set; }
     }
 }

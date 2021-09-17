@@ -11,5 +11,6 @@ namespace HR_System_Backend.Model.Input
         public string devicePort { get; set; }
         public int? priority { get; set; }
         public string deviceName { get; set; }
+        public int?  branchId { get; set; }
     }
 }

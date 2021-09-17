@@ -63,7 +63,7 @@ namespace HR_System_Backend
                 });
             });
             //var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var connectionString = Configuration.GetConnectionString("PharosConnection");
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
             if (connectionString.Contains("%CONTENTROOTPATH%"))
             {
@@ -92,6 +92,7 @@ namespace HR_System_Backend
             services.AddTransient<IFingerRepository, FingerRepository>();
             services.AddTransient<IProductiviyRepository, ProductiviyRepository>();
             services.AddTransient<IReportRepository, ReportRepository>();
+            services.AddTransient<IBranchRepository, BranchRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,6 +106,7 @@ namespace HR_System_Backend
                 {
                     c.SwaggerEndpoint("swagger/v1/swagger.json", "HR_System API V1");
                     c.RoutePrefix = string.Empty;
+                    
                 });
             }
 

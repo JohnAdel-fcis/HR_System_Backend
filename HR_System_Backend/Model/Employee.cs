@@ -47,10 +47,11 @@ namespace HR_System_Backend.Model
         public bool? MedicalInsurancePercentage { get; set; }
         public string ProfilePicPath { get; set; }
         public bool? Deleted { get; set; }
+        public int? BranchId { get; set; }
 
+        public virtual Branch Branch { get; set; }
         public virtual Category Category { get; set; }
         public virtual Department Department { get; set; }
-        public virtual Device Device { get; set; }
         public virtual Role Role { get; set; }
         public virtual SalaryType SalaryType { get; set; }
         public virtual Shift Shift { get; set; }

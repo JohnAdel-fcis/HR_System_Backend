@@ -163,11 +163,11 @@ namespace HR_System_Backend.Controllers
 
         [HttpPost]
         [Route("SaveUsersDb")]
-        public async Task<IActionResult> SaveUsersDb(List<GetUserInfoResponse> input)
+        public async Task<IActionResult> SaveUsersDb(List<GetUserInfoResponse> input, int branchId)
         {
             try
             {
-                var response = await Irepo.SaveUsersInfoToDb(input);
+                var response = await Irepo.SaveUsersInfoToDb(input,branchId);
                 if (response.status)
                 {
                     return Ok(response);
@@ -191,11 +191,11 @@ namespace HR_System_Backend.Controllers
 
         [HttpPost]
         [Route("SaveLogsDb")]
-        public async Task<IActionResult> SaveLogsDb(List<EmpInfoFinger> input)
+        public async Task<IActionResult> SaveLogsDb(List<EmpInfoFinger> input, int branchId)
         {
             try
             {
-                var response = await Irepo.SaveLogsToDb(input);
+                var response = await Irepo.SaveLogsToDb(input,branchId);
                 if (response.status)
                 {
                     return Ok(response);

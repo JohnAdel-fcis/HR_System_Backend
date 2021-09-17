@@ -18,6 +18,7 @@ namespace HR_System_Backend.Model
         }
 
         public virtual DbSet<BounseDiscount> BounseDiscounts { get; set; }
+        public virtual DbSet<Branch> Branches { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Covenant> Covenants { get; set; }
         public virtual DbSet<Creation> Creations { get; set; }
@@ -88,6 +89,17 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.BounseDiscounts)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__BOUNSE_DI__EMPLO__5CD6CB2B");
+            });
+
+            modelBuilder.Entity<Branch>(entity =>
+            {
+                entity.ToTable("BRANCH");
+
+                entity.Property(e => e.BranchId).HasColumnName("BRANCH_ID");
+
+                entity.Property(e => e.BranchName)
+                    .HasMaxLength(100)
+                    .HasColumnName("BRANCH_NAME");
             });
 
             modelBuilder.Entity<Category>(entity =>
@@ -261,6 +273,8 @@ namespace HR_System_Backend.Model
 
                 entity.Property(e => e.DeviceId).HasColumnName("DEVICE_ID");
 
+                entity.Property(e => e.BranchId).HasColumnName("BRANCH_ID");
+
                 entity.Property(e => e.DeviceIp)
                     .HasMaxLength(30)
                     .HasColumnName("DEVICE_IP");
@@ -277,6 +291,11 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.Priority)
                     .HasColumnName("PRIORITY")
                     .HasDefaultValueSql("((0))");
+
+                entity.HasOne(d => d.Branch)
+                    .WithMany(p => p.Devices)
+                    .HasForeignKey(d => d.BranchId)
+                    .HasConstraintName("FK__DEVICES__BRANCH___24E777C3");
             });
 
             modelBuilder.Entity<Document>(entity =>
@@ -324,6 +343,8 @@ namespace HR_System_Backend.Model
                 entity.Property(e => e.AllowOut).HasColumnName("ALLOW_OUT");
 
                 entity.Property(e => e.BaseTime).HasColumnName("BASE_TIME");
+
+                entity.Property(e => e.BranchId).HasColumnName("BRANCH_ID");
 
                 entity.Property(e => e.CategoryId).HasColumnName("CATEGORY_ID");
 
@@ -395,6 +416,11 @@ namespace HR_System_Backend.Model
 
                 entity.Property(e => e.TimeOut).HasColumnName("TIME_OUT");
 
+                entity.HasOne(d => d.Branch)
+                    .WithMany(p => p.Employees)
+                    .HasForeignKey(d => d.BranchId)
+                    .HasConstraintName("FK__EMPLOYEE__BRANCH__25DB9BFC");
+
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.CategoryId)
@@ -404,11 +430,6 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.DepartmentId)
                     .HasConstraintName("FK__EMPLOYEE__DEPART__25869641");
-
-                entity.HasOne(d => d.Device)
-                    .WithMany(p => p.Employees)
-                    .HasForeignKey(d => d.DeviceId)
-                    .HasConstraintName("FK__EMPLOYEE__DEVICE__2CBDA3B5");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Employees)

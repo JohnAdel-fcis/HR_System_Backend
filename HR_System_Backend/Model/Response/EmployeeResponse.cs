@@ -36,5 +36,6 @@ namespace HR_System_Backend.Model.Response
         public List<ItemResponse> items { get; set; }
         public int? code { get; set; }
         public Image empPhoto { get; set; }
+        public int? branchId { get; set; }
     }
 }

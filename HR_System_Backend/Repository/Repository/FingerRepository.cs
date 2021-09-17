@@ -44,7 +44,7 @@ namespace HR_System_Backend.Repository.Repository
 
         }
 
-        public async Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input)
+        public async Task<Response<bool>> SaveLogsToDb(List<EmpInfoFinger> input , int branchId)
         {
             var response = new Response<bool>();
             try
@@ -54,7 +54,7 @@ namespace HR_System_Backend.Repository.Repository
 
                 foreach (var item in data)
                 {
-                    var emp = _context.Employees.Include(x => x.Shift).Include(x => x.WorkTimes).Where(x => x.Code == item.idwEnrollNumber && x.DeviceId == item.deviceId).FirstOrDefault();
+                    var emp = _context.Employees.Include(x => x.Shift).Include(x => x.WorkTimes).Where(x => x.Code == item.idwEnrollNumber && x.BranchId == branchId).FirstOrDefault();
                     if (emp == null)
                     {
                         CodeNoEmp.Add(item.idwEnrollNumber);
@@ -145,28 +145,42 @@ namespace HR_System_Backend.Repository.Repository
         {
             var response = new Response<bool>();
             var device = new CZKEM();
-            var connected = device.Connect_Net(input.ip, Convert.ToInt32(input.port));
-            if (connected)
+            try
             {
-                var added = device.SSR_SetUserInfo(1, userId.ToString(), name, password, role, true);
-                if (added)
+                var connected = device.Connect_Net(input.ip, Convert.ToInt32(input.port));
+                if (connected)
                 {
-                    response.status = true;
-                    response.message = "Added succesfuly";
-                    return response;
+                    var added = device.SSR_SetUserInfo(1, userId.ToString(), name, password, role, true);
+                    if (added)
+                    {
+                        device.Disconnect();
+                        response.status = true;
+                        response.message = "Added succesfuly";
+                        return response;
+                    }
+                    else
+                    {
+                        device.Disconnect();
+                        response.status = false;
+                        response.message = "Can't Add the User";
+                        return response;
+                    }
                 }
                 else
                 {
+                    device.Disconnect();
                     response.status = false;
-                    response.message = "Can't Add the User";
+                    response.message = "Can't connect the device";
                     return response;
                 }
             }
-            else
+            catch (Exception ex)
             {
+                device.Disconnect();
                 response.status = false;
-                response.message = "Can't connect the device";
+                response.message = ex.Message ;
                 return response;
+                
             }
 
         }
@@ -224,7 +238,7 @@ namespace HR_System_Backend.Repository.Repository
         }
 
 
-        public async Task<Response<bool>> SaveUsersInfoToDb(List<GetUserInfoResponse> input)
+        public async Task<Response<bool>> SaveUsersInfoToDb(List<GetUserInfoResponse> input , int branchId)
         {
             var response = new Response<bool>();
             try
@@ -237,7 +251,7 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 foreach (var item in input)
                 {
-                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id) && x.DeviceId == item.deviceId).FirstOrDefault();
+                    var exist = _context.Employees.Where(x => x.Code == Int32.Parse(item.id) && x.BranchId == branchId).FirstOrDefault();
                     if (exist == null)
                     {
                         var emp = new Employee
@@ -246,7 +260,8 @@ namespace HR_System_Backend.Repository.Repository
                             Code = Int32.Parse(item.id),
                             DeviceId = item.deviceId,
                             Password = item.password,
-                            RoleId = item.privilage
+                            RoleId = item.privilage,
+                            BranchId = branchId
                         };
                         _context.Employees.Add(emp);
                     }
@@ -271,8 +286,8 @@ namespace HR_System_Backend.Repository.Repository
 
             var response = new Response<EmpInfoFinger>();
             var axCZKEM1 = new zkemkeeper.CZKEM();
-            
-            
+
+
 
             bool bIsConnected = false;
             int iMachineNumber = 1;
@@ -418,10 +433,10 @@ namespace HR_System_Backend.Repository.Repository
                         password = password,
                         privilage = privilage,
                         enabled = enabled
-
+                        
                     });
                 }
-                
+
                 axCZKEM1.EnableDevice(iMachineNumber, true);//enable the device
                 axCZKEM1.Disconnect();
                 if (userList.Count > 0)
@@ -452,7 +467,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority , deviceName = x.DeviceName}).ToListAsync();
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority, deviceName = x.DeviceName }).ToListAsync();
                 if (devices.Count == 0)
                 {
                     response.status = false;
@@ -487,12 +502,12 @@ namespace HR_System_Backend.Repository.Repository
                     response.message = "هذا الجهاز موجود";
                     return response;
                 }
-                var newDevice = new Device { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceName = input.deviceName };
+                var newDevice = new Device { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceName = input.deviceName  , BranchId = input.branchId};
                 await _context.Devices.AddAsync(newDevice);
                 await _context.SaveChangesAsync();
                 response.status = true;
                 response.message = "تمت اضافة الجهاز بنجاح";
-                response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId, deviceName = newDevice.DeviceName });
+                response.data.Add(new DeviceResponse { DeviceIp = input.deviceIP, DevicePort = input.devicePort, Priority = input.priority, DeviceId = newDevice.DeviceId, deviceName = newDevice.DeviceName , branchId = newDevice.BranchId });
                 return response;
             }
             catch (Exception ex)
@@ -562,7 +577,7 @@ namespace HR_System_Backend.Repository.Repository
             }
 
         }
-    
+
         public async Task<Response<DeviceResponse>> DeleteDevice(int id)
         {
             var response = new Response<DeviceResponse>();
@@ -577,7 +592,7 @@ namespace HR_System_Backend.Repository.Repository
                 }
 
                 var employee = _context.Employees.Where(x => x.DeviceId == id).FirstOrDefault();
-                if (employee!= null)
+                if (employee != null)
                 {
                     response.status = false;
                     response.message = "يوجد موظفين مسجلين برقم الجهاز يرجي تغيرهم اولا";
@@ -592,12 +607,12 @@ namespace HR_System_Backend.Repository.Repository
             catch (Exception ex)
             {
                 response.status = false;
-                response.message = "حدث خطأ " + ex.Message ;
+                response.message = "حدث خطأ " + ex.Message;
                 return response;
             }
         }
-    
-    
-    
+
+
+
     }
 }
