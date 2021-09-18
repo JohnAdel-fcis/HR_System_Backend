@@ -467,7 +467,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority, deviceName = x.DeviceName }).ToListAsync();
+                var devices = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority, deviceName = x.DeviceName , branchId=x.BranchId}).ToListAsync();
                 if (devices.Count == 0)
                 {
                     response.status = false;
@@ -557,7 +557,7 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<DeviceResponse>();
             try
             {
-                var device = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority }).Where(x => x.DeviceId == id).FirstOrDefaultAsync();
+                var device = await _context.Devices.Select(x => new DeviceResponse { DeviceId = x.DeviceId, DeviceIp = x.DeviceIp, DevicePort = x.DevicePort, Priority = x.Priority , deviceName = x.DeviceName ,branchId =x.BranchId}).Where(x => x.DeviceId == id).FirstOrDefaultAsync();
                 if (device == null)
                 {
                     response.status = false;

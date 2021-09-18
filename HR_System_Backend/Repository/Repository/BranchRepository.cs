@@ -71,7 +71,7 @@ namespace HR_System_Backend.Repository.Repository
                         return response;
                     }
                 }
-
+                _context.Branches.Remove(branch);
                 await _context.SaveChangesAsync();
                 response.status = true;
                 response.message = "تم حذف الفرع و اجهزه البصمه و الموظفين في القسم من البرنامج";
