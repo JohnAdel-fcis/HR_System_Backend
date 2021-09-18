@@ -29,13 +29,13 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                var resp = await ValidateEmployee(_context, input);
-                if (!resp.status)
-                    return resp;
+                //var resp = await ValidateEmployee(_context, input);
+                //if (!resp.status)
+                //    return resp;
 
 
                 //Get The best code
-                var codes = await _context.Employees.Where(s => s.DeviceId == input.deviceId).Select(x => x.Code).ToListAsync();
+                var codes = await _context.Employees.Where(s => s.BranchId == input.branchId).Select(x => x.Code).ToListAsync();
                 codes.Sort();
                 int? newCode = 1;
                 foreach (var code in codes)
@@ -52,18 +52,18 @@ namespace HR_System_Backend.Repository.Repository
 
 
 
-                if (input.addToDevice && input.branchId== null )
+                if (input.addToDevice && input.branchId != null)
                 {
                     //Save The Employe To FingerPrint Device
                     string errorResposne = "";
                     var fingerRepo = new FingerRepository(_context);
-                    var devices =  _context.Branches.Include(x => x.Devices).Where(x => x.BranchId == input.branchId).FirstOrDefault()?.Devices.ToList();
+                    var devices = _context.Branches.Include(x => x.Devices).Where(x => x.BranchId == input.branchId).FirstOrDefault()?.Devices.ToList();
                     foreach (var device in devices)
                     {
                         var saveUserResponse = fingerRepo.SetUserFinger(newCode.Value, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
                         if (saveUserResponse.status == false)
                         {
-                            errorResposne = errorResposne+"جهاز البصمه باسم" + device.DeviceName + " لا يستجيب يرجى ادخال الموظف يدويا" + System.Environment.NewLine;
+                            errorResposne = errorResposne + "جهاز البصمه باسم" + device.DeviceName + " لا يستجيب يرجى ادخال الموظف يدويا" + System.Environment.NewLine;
                             continue;
                         }
                     }
@@ -71,15 +71,16 @@ namespace HR_System_Backend.Repository.Repository
                     {
                         response.status = true;
                         response.message = "تم حفظ البيانات في الاجهزه و النظام بنجاح";
-                        
+
                     }
                     else
                     {
                         response.status = false;
                         response.message = errorResposne;
-                       
+
+
                     }
-                   
+
                     //////////////////////////////////////////
                 }
                 else
@@ -239,7 +240,7 @@ namespace HR_System_Backend.Repository.Repository
                     shiftId = input.shiftId,
                     holiday = input.holiday
                 };
-                
+
                 response.data.Add(employeeResponse);
                 return response;
 
@@ -281,7 +282,7 @@ namespace HR_System_Backend.Repository.Repository
                 if (fingerDelete)
                 {
                     string errorResposne = "";
-                    var branch = _context.Branches.Where(x => x.BranchId == emp.BranchId).FirstOrDefault();
+                    var branch = _context.Branches.Include(x => x.Devices).Where(x => x.BranchId == emp.BranchId).FirstOrDefault();
                     if (branch == null)
                     {
                         response.status = false;
@@ -295,7 +296,7 @@ namespace HR_System_Backend.Repository.Repository
                         {
                             errorResposne = errorResposne + "جهاز البصمه باسم" + device.DeviceName + " لا يستجيب يرجى حذف الموظف يدويا" + System.Environment.NewLine;
 
-                            
+
                         }
                     }
 
@@ -819,16 +820,16 @@ namespace HR_System_Backend.Repository.Repository
             //check if  finger Device is existing
             ///////////////////////////////////////////////////////////////////////////
             ///
-            if (emp.addToDevice || (emp.deviceId != 0 && emp.deviceId != null))
-            {
-                var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
-                if (device == null)
-                {
-                    response.status = false;
-                    response.message = "جهاز البصمة غير موجود";
-                    return response;
-                }
-            }
+            //if (emp.addToDevice || (emp.deviceId != 0 && emp.deviceId != null))
+            //{
+            //    var device = await db.Devices.Where(x => x.DeviceId == emp.deviceId).FirstOrDefaultAsync();
+            //    if (device == null)
+            //    {
+            //        response.status = false;
+            //        response.message = "جهاز البصمة غير موجود";
+            //        return response;
+            //    }
+            //}
 
 
             ///////////////////////////////////////////////////////////////////////////
