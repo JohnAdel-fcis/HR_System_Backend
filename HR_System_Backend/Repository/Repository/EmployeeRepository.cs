@@ -29,9 +29,9 @@ namespace HR_System_Backend.Repository.Repository
             var response = new Response<EmployeeResponse>();
             try
             {
-                //var resp = await ValidateEmployee(_context, input);
-                //if (!resp.status)
-                //    return resp;
+                var resp = await ValidateEmployee(_context, input);
+                if (!resp.status)
+                    return resp;
 
 
                 //Get The best code
@@ -835,6 +835,10 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if departmen is existing
             ///////////////////////////////////////////////////////////////////////////
+            if (emp.departmentId == 0)
+            {
+                emp.departmentId = null;
+            }
             if (emp.departmentId != null)
             {
                 var dept = await db.Departments.Where(x => x.DepartmentId == emp.departmentId).FirstOrDefaultAsync();
@@ -848,6 +852,12 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if social precentage
             ///////////////////////////////////////////////////////////////////////////
+            ///
+
+
+
+
+
             if (emp.socialInsurancePercentage != null)
             {
                 if (emp.socialInsurancePercentage.Value)
@@ -865,6 +875,7 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if social precentage
             ///////////////////////////////////////////////////////////////////////////
+            
             if (emp.medicalInsurancePercentage != null)
             {
                 if (emp.medicalInsurancePercentage.Value)
@@ -887,6 +898,10 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if category is existing
             ///////////////////////////////////////////////////////////////////////////
+            if (emp.categoryId == 0)
+            {
+                emp.categoryId = null;
+            }
             if (emp.categoryId != null)
             {
                 var cat = await db.Categories.Where(x => x.CategoryId == emp.categoryId).FirstOrDefaultAsync();
@@ -904,6 +919,10 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if salary type is existing
             ///////////////////////////////////////////////////////////////////////////
+            if (emp.salaryId == 0)
+            {
+                emp.salaryId = null;
+            }
             if (emp.salaryId != null)
             {
                 var salaryType = await db.SalaryTypes.Where(x => x.SalaryTypeId == emp.salaryId).FirstOrDefaultAsync();
@@ -921,6 +940,10 @@ namespace HR_System_Backend.Repository.Repository
             ///////////////////////////////////////////////////////////////////////////
             //check if shift is existing
             ///////////////////////////////////////////////////////////////////////////
+            if (emp.shiftId == 0)
+            {
+                emp.shiftId = null;
+            }
             if (emp.shiftId != null)
             {
                 var shift = await db.Shifts.Where(x => x.ShiftId == emp.shiftId).FirstOrDefaultAsync();
