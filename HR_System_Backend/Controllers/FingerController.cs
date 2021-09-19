@@ -162,7 +162,7 @@ namespace HR_System_Backend.Controllers
 
 
         [HttpPost]
-        [Route("SaveUsersDb")]
+        [Route("SaveUsersDb/{branchId}")]
         public async Task<IActionResult> SaveUsersDb(List<GetUserInfoResponse> input, int branchId)
         {
             try
@@ -190,7 +190,7 @@ namespace HR_System_Backend.Controllers
 
 
         [HttpPost]
-        [Route("SaveLogsDb")]
+        [Route("SaveLogsDb/{branchId}")]
         public async Task<IActionResult> SaveLogsDb(List<EmpInfoFinger> input, int branchId)
         {
             try
