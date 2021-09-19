@@ -63,7 +63,7 @@ namespace HR_System_Backend
                 });
             });
             //var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            var connectionString = Configuration.GetConnectionString("PharosConnection");
 
             if (connectionString.Contains("%CONTENTROOTPATH%"))
             {

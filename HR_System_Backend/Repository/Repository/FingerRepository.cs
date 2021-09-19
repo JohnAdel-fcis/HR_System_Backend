@@ -637,10 +637,10 @@ namespace HR_System_Backend.Repository.Repository
             }  
             else
             {
-                error = "لا يمكن التوصيل بالاجهزه الاتية : " ;
+                error = "لا يمكن التوصيل بالاجهزه الاتية " ;
                 foreach (var device in disConnectedDevice)
                 {
-                    error =error+ device +" , ";
+                    error =error+ "("+ device +" , " +")";
                 }
                 return error ;
             }

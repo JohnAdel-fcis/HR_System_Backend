@@ -778,7 +778,9 @@ namespace HR_System_Backend.Repository.Repository
                                             items = x.Items.Select(x => new ItemResponse { ItemId = x.ItemId, ItemName = x.ItemName, ItemPrice = x.ItemPrice, ItemCommission = x.ItemCommission, ItemQnty = x.ItemQnty }).ToList(),
                                             roleId = x.RoleId,
                                             password = x.Password,
-                                            productivity = x.Productivity.Value
+                                            productivity = x.Productivity.Value,
+                                            branchId=x.BranchId 
+                                            
 
                                         }).FirstOrDefaultAsync();
 
@@ -829,7 +831,7 @@ namespace HR_System_Backend.Repository.Repository
             }
 
         }
-
+        
         public async Task<Response<RoleResponse>> GetRoles()
         {
             var response = new Response<RoleResponse>();
