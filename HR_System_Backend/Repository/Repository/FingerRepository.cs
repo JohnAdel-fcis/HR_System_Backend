@@ -612,7 +612,40 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+        public string checkConnectDevices(List<Device> input)
+        {
+            var axCZKEM1 = new zkemkeeper.CZKEM();
+            var disConnectedDevice  = new List<string> () ;
+            string error = "" ;
+            foreach (var device in input)
+            {
+                var bIsConnected = axCZKEM1.Connect_Net(device.DeviceIp , Convert.ToInt32(device.DevicePort));
+                if (!bIsConnected)
+                {
+                    disConnectedDevice.Add(device.DeviceName);
+                }
+                else
+                {
+                    axCZKEM1.Disconnect();
+                }
 
+            }
+
+            if (disConnectedDevice.Count == 0)
+            {
+                return null ;
+            }  
+            else
+            {
+                error = "لا يمكن التوصيل بالاجهزه الاتية : " ;
+                foreach (var device in disConnectedDevice)
+                {
+                    error =error+ device +" , ";
+                }
+                return error ;
+            }
+        }
+    
 
     }
 }

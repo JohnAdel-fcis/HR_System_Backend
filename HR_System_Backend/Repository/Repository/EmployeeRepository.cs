@@ -58,6 +58,27 @@ namespace HR_System_Backend.Repository.Repository
                     string errorResposne = "";
                     var fingerRepo = new FingerRepository(_context);
                     var devices = _context.Branches.Include(x => x.Devices).Where(x => x.BranchId == input.branchId).FirstOrDefault()?.Devices.ToList();
+                    
+                    
+                    if (devices.Count == 0)
+                    {
+                        response.status = false ;
+                        response.message = "لا يوجد اجهزه في الفرع";
+                        return response ;
+                    }
+                    
+                    var error = fingerRepo.checkConnectDevices(devices);
+                    if (error != null)
+                    {
+                        response.status = false ;
+                        response.message = error;
+                        return response ;
+                    }
+                    
+                  
+                    
+                    
+                    
                     foreach (var device in devices)
                     {
                         var saveUserResponse = fingerRepo.SetUserFinger(newCode.Value, input.name, input.roleId.Value, new FingerGetAllInput { ip = device.DeviceIp, port = device.DevicePort }, input.password);
@@ -289,6 +310,29 @@ namespace HR_System_Backend.Repository.Repository
                         response.message = "الموظف ليس له فرع لا يمكن الحذف";
                         return response;
                     }
+
+                    
+                    if (branch.Devices.Count == 0)
+                    {
+                        response.status = false ;
+                        response.message = "لا يوجد اجهزه في الفرع";
+                        return response ;
+                    }
+                    
+                    var error = fingerRepo.checkConnectDevices(branch.Devices.ToList());
+                    if (error != null)
+                    {
+                        response.status = false ;
+                        response.message = error;
+                        return response ;
+                    }
+
+
+
+
+
+
+
                     foreach (var device in branch.Devices)
                     {
                         var deleteFromDeviceResponse = fingerRepo.DeleteUserFinger(1, emp.Code.ToString(), device);
