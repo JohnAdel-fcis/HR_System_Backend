@@ -13,6 +13,7 @@ namespace HR_System_Backend.Model
             Covenants = new HashSet<Covenant>();
             Debits = new HashSet<Debit>();
             Documents = new HashSet<Document>();
+            ExcusedAbsences = new HashSet<ExcusedAbsence>();
             FingerLogs = new HashSet<FingerLog>();
             ItemTransactions = new HashSet<ItemTransaction>();
             Items = new HashSet<Item>();
@@ -61,6 +62,7 @@ namespace HR_System_Backend.Model
         public virtual ICollection<Covenant> Covenants { get; set; }
         public virtual ICollection<Debit> Debits { get; set; }
         public virtual ICollection<Document> Documents { get; set; }
+        public virtual ICollection<ExcusedAbsence> ExcusedAbsences { get; set; }
         public virtual ICollection<FingerLog> FingerLogs { get; set; }
         public virtual ICollection<ItemTransaction> ItemTransactions { get; set; }
         public virtual ICollection<Item> Items { get; set; }

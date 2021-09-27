@@ -20,8 +20,7 @@ namespace HR_System_Backend.Repository.Repository
             _context = context;
         }
 
-        public async Task<Response<OverTimeResponse>>
-        AddOverTime(OverTimeInput input)
+        public async Task<Response<OverTimeResponse>> AddOverTime(OverTimeInput input)
         {
             var response = new Response<OverTimeResponse>();
             try
@@ -75,7 +74,8 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 var TotalOverTimePrice = overhourPrice * input.hours;
                 var overTime =
-                    new OverTime {
+                    new OverTime
+                    {
                         OverTimeHours = input.hours.Value,
                         OverTimeDate = input.date,
                         OverHourPrice = input.overHourPrice,
@@ -92,7 +92,8 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     employee
                         .WorkTimes
-                        .Add(new WorkTime {
+                        .Add(new WorkTime
+                        {
                             WorkDate = overTime.OverTimeDate,
                             OverTime = overTime
                         });
@@ -106,7 +107,8 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "تم اضافة العمل الإضافي";
                 response
                     .data
-                    .Add(new OverTimeResponse {
+                    .Add(new OverTimeResponse
+                    {
                         OverTimeId = overTime.OverTimeId,
                         OverHourPrice = overTime.OverHourPrice,
                         OverTimePercentage = overTime.OverTimePercentage,
@@ -156,7 +158,8 @@ namespace HR_System_Backend.Repository.Repository
                             timeTo.Subtract(timeFrom).TotalHours));
 
                 var shft =
-                    new Shift {
+                    new Shift
+                    {
                         ShiftName = shift.shiftName,
                         DateFrom = shift.dateFrom,
                         DateTo = shift.dateTo,
@@ -167,14 +170,15 @@ namespace HR_System_Backend.Repository.Repository
                         ShiftHour = shiftHours
                     };
 
-                _context.Shifts.Add (shft);
+                _context.Shifts.Add(shft);
                 await _context.SaveChangesAsync();
 
                 response.status = true;
                 response.message = "تم اضافة الوردية بنجاح";
                 response
                     .data
-                    .Add(new ShiftResponse {
+                    .Add(new ShiftResponse
+                    {
                         shiftId = shft.ShiftId,
                         shiftName = shft.ShiftName,
                         dateFrom = shft.DateFrom,
@@ -220,7 +224,7 @@ namespace HR_System_Backend.Repository.Repository
                         "يوجد في الوردية موظفين ...قم بتغير وردياتهم اولا";
                     return response;
                 }
-                _context.Shifts.Remove (shift);
+                _context.Shifts.Remove(shift);
                 await _context.SaveChangesAsync();
                 response.status = true;
                 response.message = "تم ازالة الموظف بنجاح";
@@ -234,8 +238,7 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
-        public async Task<Response<ShiftResponse>>
-        EditShift(ShiftResponse shift)
+        public async Task<Response<ShiftResponse>> EditShift(ShiftResponse shift)
         {
             var response = new Response<ShiftResponse>();
             try
@@ -273,7 +276,8 @@ namespace HR_System_Backend.Repository.Repository
                 response.message = "تم تعديل الوردية بنجاح";
                 response
                     .data
-                    .Add(new ShiftResponse {
+                    .Add(new ShiftResponse
+                    {
                         shiftId = shft.ShiftId,
                         shiftName = shft.ShiftName,
                         dateFrom = shft.DateFrom,
@@ -304,7 +308,8 @@ namespace HR_System_Backend.Repository.Repository
                     await _context
                         .Shifts
                         .Select(x =>
-                            new ShiftResponse {
+                            new ShiftResponse
+                            {
                                 shiftId = x.ShiftId,
                                 shiftName = x.ShiftName,
                                 dateFrom = x.DateFrom,
@@ -348,7 +353,8 @@ namespace HR_System_Backend.Repository.Repository
                         .Shifts
                         .Where(s => s.ShiftId == id)
                         .Select(x =>
-                            new ShiftResponse {
+                            new ShiftResponse
+                            {
                                 shiftId = x.ShiftId,
                                 shiftName = x.ShiftName,
                                 dateFrom = x.DateFrom,
@@ -364,7 +370,7 @@ namespace HR_System_Backend.Repository.Repository
                 {
                     response.status = true;
                     response.message = "تم سحب البيانات بنجاح ";
-                    response.data.Add (shift);
+                    response.data.Add(shift);
                     return response;
                 }
                 else
@@ -382,13 +388,161 @@ namespace HR_System_Backend.Repository.Repository
             }
         }
 
+        public async Task<Response<AbsenceResponse>> GetAllAbsenceDays(AttendLeaveReportInput input)
+        {
+            var response = new Response<AbsenceResponse>();
+            try
+            {
+                var emp = await _context.Employees.Include(x => x.ExcusedAbsences).Include(x => x.Holiday).Where(x => x.Id == input.EmployeeId).FirstOrDefaultAsync();
+                response = GetAbsenceDays(emp, input.From.Value, input.To.Value);
+                return response;
+
+            }
+            catch (System.Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+        }
+
+        public async Task<Response<AbsenceResponse>> AddExcuseAbsence(AbsenceInput input)
+        {
+            var response = new Response<AbsenceResponse>();
+            try
+            {
+                var emp = await _context.Employees.Where(x => x.Id == input.empId).FirstOrDefaultAsync();
+                if (emp == null)
+                {
+                    response.status = false;
+                    response.message = "الموظف غير موجود";
+                    return response;
+
+                }
+                _context.ExcusedAbsences.Add(new ExcusedAbsence
+                {
+                    EmpId = input.empId,
+                    AbsenceDate = input.date,
+                    Excuse = input.excuse
+                });
+                await _context.SaveChangesAsync();
+
+                response.status = true;
+                response.message = "تم حفط الغياب بعذر بنجاح";
+                return response;
+            }
+            catch (System.Exception)
+            {
+                response.status = false;
+                response.message = "الموظف غير موجود";
+                return response;
+            }
+
+
+
+
+
+
+        }
+
+
+
+
+        private Response<AbsenceResponse> GetAbsenceDays(Employee emp, DateTime from, DateTime to)
+        {
+            var response = new Response<AbsenceResponse>();
+            try
+            {
+                //حساب ايام العمل المقرره
+                List<string> holidaysName = new List<string>();
+                if (emp.Holiday == null)
+                {
+                    response.status = false;
+                    response.message = "لا يوجد اجازات ";
+                    return response;
+                }
+                foreach (PropertyInfo prop in emp.Holiday.GetType().GetProperties())
+                {
+                    if (prop == typeof(Nullable))
+                    {
+                        continue;
+                    }
+                    var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+
+                    if (type == typeof(bool))
+                    {
+
+                        if ((bool)prop.GetValue(emp.Holiday, null))
+                        {
+                            var propName = prop.Name.ToUpper();
+                            holidaysName.Add(propName);
+                        }
+                    }
+                }
+                int WorkDays = 0;
+                int HolidaysDays = 0;
+                var workTimes = _context.WorkTimes.Where(x => x.EmployeeId == emp.Id).Where(x => (x.WorkDate >= from && x.WorkDate <= to)).ToList().OrderBy(x => x.WorkDate).ToList();
+                var absenceDates = new List<AbsenceResponse>();
+                var excusedAbsenceDates = _context.ExcusedAbsences.Where(x => x.EmpId == emp.Id).Where(x => (x.AbsenceDate >= from && x.AbsenceDate <= to)).Select(x => x.AbsenceDate).ToList();
+                int workDayCount = 0;
+                foreach (DateTime day in EachDay(from, to))
+                {
+                    var dayName = day.DayOfWeek.ToString().ToUpper();
+                    if (holidaysName.Contains(dayName))
+                    {
+                        HolidaysDays++;
+                    }
+                    else
+                    {
+                        WorkDays++;
+                        if (day.Date != workTimes[workDayCount].WorkDate.Value.Date)
+                        {
+
+                            var AbsenceResponse = new AbsenceResponse();
+                            AbsenceResponse.date = day.Date;
+                            AbsenceResponse.empId = emp.Id;
+
+                            if (excusedAbsenceDates.Contains(day))
+                            {
+                                var excuse = _context.ExcusedAbsences.Where(x => x.AbsenceDate == day).FirstOrDefault();
+                                AbsenceResponse.excusedAbsence = true;
+                                AbsenceResponse.excuse = excuse.Excuse;
+                            }
+                            else
+                            {
+                                AbsenceResponse.excusedAbsence = false;
+                            }
+                            absenceDates.Add(AbsenceResponse);
+                            workDayCount++;
+
+                        }
+                        else
+                        {
+                            workDayCount++;
+                        }
+                    }
+                }
+                response.status = true;
+                response.message = " تم سحب حساب الغياب بنجاح";
+                response.data = absenceDates;
+                return response;
+            }
+            catch (System.Exception ex)
+            {
+                response.status = false;
+                response.message = ex.Message;
+                return response;
+            }
+
+        }
+
         private double getHourPrice(Employee emp)
         {
             var NumWorkDaysInWeek = 0;
             var holiday = emp.Holiday;
             foreach (PropertyInfo prop in holiday.GetType().GetProperties())
             {
-                if (prop == typeof (Nullable))
+                if (prop == typeof(Nullable))
                 {
                     continue;
                 }
@@ -396,9 +550,9 @@ namespace HR_System_Backend.Repository.Repository
                     Nullable.GetUnderlyingType(prop.PropertyType)
                         ?? prop.PropertyType;
 
-                if (type == typeof (bool))
+                if (type == typeof(bool))
                 {
-                    if (!(bool) prop.GetValue(holiday, null))
+                    if (!(bool)prop.GetValue(holiday, null))
                     {
                         NumWorkDaysInWeek++;
                     }
@@ -431,6 +585,11 @@ namespace HR_System_Backend.Repository.Repository
             }
 
             return 0;
+        }
+        public IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+        {
+            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+                yield return day;
         }
     }
 }

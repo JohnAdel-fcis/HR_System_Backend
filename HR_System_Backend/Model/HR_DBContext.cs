@@ -28,6 +28,7 @@ namespace HR_System_Backend.Model
         public virtual DbSet<Device> Devices { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<ExcusedAbsence> ExcusedAbsences { get; set; }
         public virtual DbSet<FingerLog> FingerLogs { get; set; }
         public virtual DbSet<Holiday> Holidays { get; set; }
         public virtual DbSet<Item> Items { get; set; }
@@ -44,7 +45,7 @@ namespace HR_System_Backend.Model
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-0B4I9QK\\SQLEXPRESS;Database=HR_DB;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=PHS-IT53;Database=HR_DB;Trusted_Connection=True;");
             }
         }
 
@@ -445,6 +446,28 @@ namespace HR_System_Backend.Model
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.ShiftId)
                     .HasConstraintName("FK__EMPLOYEE__SHIFT___4BAC3F29");
+            });
+
+            modelBuilder.Entity<ExcusedAbsence>(entity =>
+            {
+                entity.ToTable("EXCUSED_ABSENCE");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.AbsenceDate)
+                    .HasColumnType("date")
+                    .HasColumnName("ABSENCE_DATE");
+
+                entity.Property(e => e.EmpId).HasColumnName("EMP_ID");
+
+                entity.Property(e => e.Excuse)
+                    .HasMaxLength(200)
+                    .HasColumnName("EXCUSE");
+
+                entity.HasOne(d => d.Emp)
+                    .WithMany(p => p.ExcusedAbsences)
+                    .HasForeignKey(d => d.EmpId)
+                    .HasConstraintName("FK__EXCUSED_A__EMP_I__3429BB53");
             });
 
             modelBuilder.Entity<FingerLog>(entity =>

@@ -15,7 +15,8 @@ namespace HR_System_Backend.Repository.Interface
         Task<Response<ShiftResponse>> EditShift(ShiftResponse shift);
         Task<Response<ShiftResponse>> DeleteShift(int id);
         Task<Response<OverTimeResponse>> AddOverTime(OverTimeInput input);
-
+        Task<Response<AbsenceResponse>> GetAllAbsenceDays(AttendLeaveReportInput input);
+        Task<Response<AbsenceResponse>> AddExcuseAbsence(AbsenceInput input);
 
     }
 }

@@ -102,6 +102,37 @@ namespace HR_System_Backend.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("AddExcuseAbsence")]
+        public async Task<IActionResult> AddExcuseAbsence([FromBody] AbsenceInput input)
+        {
+            var response = await Irepo.AddExcuseAbsence(input);
+            if (response.status)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return NotFound(response);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetAbsence")]
+        public async Task<IActionResult> GetAbsence([FromBody] AttendLeaveReportInput input)
+        {
+            var response = await Irepo.GetAllAbsenceDays(input);
+            if (response.status)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return NotFound(response);
+            }
+        }
         [HttpDelete]
         [Route("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -117,6 +148,10 @@ namespace HR_System_Backend.Controllers
             }
 
         }
+
+
+
+
 
     }
 }
