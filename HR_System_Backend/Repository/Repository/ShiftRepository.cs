@@ -419,6 +419,12 @@ namespace HR_System_Backend.Repository.Repository
                     return response;
 
                 }
+               /*  if (emp.Productivity.Value && emp.SalaryTypeId == null)
+                {
+                    response.status = false;
+                    response.message = "الموظف انتاجي وليس له ساعات ";
+                    return response;
+                } */
                 _context.ExcusedAbsences.Add(new ExcusedAbsence
                 {
                     EmpId = input.empId,
@@ -481,7 +487,7 @@ namespace HR_System_Backend.Repository.Repository
                 }
                 int WorkDays = 0;
                 int HolidaysDays = 0;
-                var workTimes = _context.WorkTimes.Where(x => x.EmployeeId == emp.Id).Where(x => (x.WorkDate >= from && x.WorkDate <= to)).ToList().OrderBy(x => x.WorkDate).ToList();
+                var workTimes = _context.WorkTimes.Where(x => x.EmployeeId == emp.Id).Where(x => (x.WorkDate >= from && x.WorkDate <= to)).Select(x=>x.WorkDate).ToList();
                 var absenceDates = new List<AbsenceResponse>();
                 var excusedAbsenceDates = _context.ExcusedAbsences.Where(x => x.EmpId == emp.Id).Where(x => (x.AbsenceDate >= from && x.AbsenceDate <= to)).Select(x => x.AbsenceDate).ToList();
                 int workDayCount = 0;
@@ -495,7 +501,9 @@ namespace HR_System_Backend.Repository.Repository
                     else
                     {
                         WorkDays++;
-                        if (day.Date != workTimes[workDayCount].WorkDate.Value.Date)
+                        
+                        
+                        if (!workTimes.Contains(day.Date))
                         {
 
                             var AbsenceResponse = new AbsenceResponse();
